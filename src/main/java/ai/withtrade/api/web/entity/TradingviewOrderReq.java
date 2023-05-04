@@ -146,6 +146,9 @@ public class TradingviewOrderReq {
 	@JsonProperty(value = "alert_name")
 	String alertName;
 
+	@JsonProperty(value = "alert_time")
+	String alertTime;
+	
 	@JsonProperty(value = "order_id")
 	String orderId;
 
@@ -167,9 +170,6 @@ public class TradingviewOrderReq {
 	@JsonProperty(value = "order_symbol")
 	String orderSymbol;
 
-	@JsonProperty(value = "order_time")
-	String orderTime;
-	
 	@JsonIgnore
 	AuthKey authKeyObj;
 	
