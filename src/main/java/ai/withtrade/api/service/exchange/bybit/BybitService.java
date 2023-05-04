@@ -1,4 +1,4 @@
-package ai.withtrade.api.service.bybit;
+package ai.withtrade.api.service.exchange.bybit;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -124,11 +124,10 @@ public class BybitService {
 		// 포지션 open/close - Trade > Place Order (/v5/order/create) 
 		// https://bybit-exchange.github.io/docs/v5/order/create-order
 		
-		boolean isTake = false;
-		if(tvOrder.getOrderName().toUpperCase().indexOf("TAKE") >= 0) {
-			isTake = true;
-		}
-		
+    	if(TradingviewOrderReq.OrderAction.buy != tvOrder.getOrderAction() || TradingviewOrderReq.OrderAction.sell != tvOrder.getOrderAction()) {
+        	throw new RuntimeException("Invaild order_mode parameter.([buy, sell])");
+    	}
+    	
 		String timestamp = Long.toString(ZonedDateTime.now().toInstant().toEpochMilli());
 
         Map<String, Object> map = new HashMap<>();
@@ -137,19 +136,29 @@ public class BybitService {
         map.put("side", tvOrder.getOrderAction());
         map.put("orderType", "Market");
         map.put("qty", tvOrder.getOrderSize());
+        map.put("reduceOnly", "true");
         
-        if(TradingviewOrderReq.OrderMode.hedge == tvOrder.getOrderMode()) {
-        	/*
+
+    	/*
 positionIdx	false	integer	
 Used to identify positions in different position modes. Under hedge-mode, this param is required
 
 0: one-way mode
 1: hedge-mode Buy side
 2: hedge-mode Sell side
-        	 */
+    	 */
+        if(TradingviewOrderReq.OrderMode.hedge == tvOrder.getOrderMode()) {
+        	if(TradingviewOrderReq.OrderAction.buy == tvOrder.getOrderAction()) {
+            	map.put("positionIdx", Integer.valueOf(1));
+        	} else if(TradingviewOrderReq.OrderAction.sell == tvOrder.getOrderAction()) {
+            	map.put("positionIdx", Integer.valueOf(2));
+        	}
+        } else if(TradingviewOrderReq.OrderMode.oneway == tvOrder.getOrderMode()) {
+        	map.put("positionIdx", Integer.valueOf(0));
+        } else {
+        	throw new RuntimeException("Invaild order_mode parameter.([hedge, oneway])");
         }
         
-        if(isTake)	map.put("reduceOnly", "true");
 
         String signature = genPostSign(tvOrder.getAuthKeyObj().getApiKey(), tvOrder.getAuthKeyObj().getApiSecret(), timestamp, map);
 //        String jsonMap = JSON.toJSONString(map);

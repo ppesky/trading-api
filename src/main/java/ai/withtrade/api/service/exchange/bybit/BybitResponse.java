@@ -1,4 +1,4 @@
-package ai.withtrade.api.service.bybit;
+package ai.withtrade.api.service.exchange.bybit;
 
 import lombok.Getter;
 import lombok.Setter;
