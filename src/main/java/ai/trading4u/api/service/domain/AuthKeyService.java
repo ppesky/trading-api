@@ -1,4 +1,4 @@
-package ai.withtrade.api;
+package ai.trading4u.api.service.domain;
 
 import java.nio.charset.StandardCharsets;
 
@@ -6,12 +6,13 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
-import org.springframework.stereotype.Component;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
-import ai.withtrade.api.web.entity.AuthKey;
+import ai.trading4u.api.web.entity.AuthKey;
 
-@Component
-public class AuthKeyUtils {
+@Service
+public class AuthKeyService {
 	
 	private String internalKey = "Tbe_rhJ#nw$9Aahj";
 	
@@ -19,9 +20,10 @@ public class AuthKeyUtils {
 		return encrypt(authKey.getComputeString());
 	}
 	
+	@Cacheable(cacheNames = "authkey")
 	public AuthKey resolveKey(String authKeyStr) {
 		String computeString = decrypt(authKeyStr);
-		return AuthKey.getAuthKey(computeString);
+		return AuthKey.getAuthKey(authKeyStr, computeString);
 	}
 
 	public String encrypt(String plainText) {

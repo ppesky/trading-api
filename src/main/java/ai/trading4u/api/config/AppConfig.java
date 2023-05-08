@@ -1,4 +1,4 @@
-package ai.withtrade.api.config;
+package ai.trading4u.api.config;
 
 import javax.net.ssl.SSLException;
 

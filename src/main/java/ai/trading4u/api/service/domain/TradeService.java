@@ -1,4 +1,4 @@
-package ai.withtrade.api.service.domain;
+package ai.trading4u.api.service.domain;
 
 import org.springframework.stereotype.Service;
 

@@ -1,9 +1,9 @@
-package ai.withtrade.api.web;
+package ai.trading4u.api.web;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ai.withtrade.api.web.entity.TradingviewOrderReq;
+import ai.trading4u.api.web.entity.TradingviewOrderReq;
 
 @RestController
 public class TradingviewController {

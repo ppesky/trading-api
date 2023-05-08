@@ -1,4 +1,4 @@
-package ai.withtrade.api.service.exchange.bybit;
+package ai.trading4u.api.service.exchange.bybit;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -12,12 +12,18 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ai.withtrade.api.web.entity.TradingviewOrderReq;
+import ai.trading4u.api.service.domain.TradeRepository;
+import ai.trading4u.api.service.domain.entity.TradeData;
+import ai.trading4u.api.web.entity.AuthKey;
+import ai.trading4u.api.web.entity.TradingviewOrderReq;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class BybitService {
 	/*
@@ -35,24 +41,36 @@ public class BybitService {
 	@Autowired WebClient sslWebClient;
 	@Autowired ObjectMapper objMapper;
 	
-	public void validateReferral(TradingviewOrderReq tvOrder) {
+	@Autowired TradeRepository tradeRepository;
+	
+	public boolean validateReferral(AuthKey authKeyObj) {
 		// 키 인증  - User > Get API Key Information (/v5/user/query-api)
 		// https://bybit-exchange.github.io/docs/v5/user/apikey-info
 		// inviterID	integer	Inviter ID (the UID of the account which invited this account to the platform)
 		
-		String res = 
+		String timestamp = Long.toString(ZonedDateTime.now().toInstant().toEpochMilli());
+		
+		BybitResponse res = 
 				sslWebClient
 				.get()
 				.uri(domain + "/v5/user/query-api")
 				.accept(MediaType.APPLICATION_JSON)
-				.header("X-BAPI-API-KEY", tvOrder.getAuthKeyObj().getApiKey())
-				.header("X-BAPI-SIGN", "")
-				.header("X-BAPI-SIGN-TYPE", "2")
-				.header("X-BAPI-TIMESTAMP", "")
+				.header("apiKey", authKeyObj.getApiKey())
+				.header("secret", authKeyObj.getApiSecret())
+				.header("X-BAPI-TIMESTAMP", timestamp)
 				.header("X-BAPI-RECV-WINDOW", RECV_WINDOW)
 				.retrieve()
-				.bodyToMono(String.class)
+				.bodyToMono(BybitResponse.class)
 				.block();
+
+		if(res.getRetCode() == 0) {
+			
+//			res.getResult() 에서 초대자코드 확인.
+			
+			return true;
+		}
+		return false;
+		
 		/*
 {
     "retCode": 0,
@@ -120,23 +138,32 @@ public class BybitService {
 	 * https://github.com/bybit-exchange/api-usage-examples/blob/master/V3_demo/api_demo/unified_margin/Encryption_HMAC.java
 	 * @param tvOrder
 	 */
-	public void placeOrder(TradingviewOrderReq tvOrder) {
+	@Transactional
+	public void placeOrder(AuthKey authKeyObj, TradeData data) {
 		// 포지션 open/close - Trade > Place Order (/v5/order/create) 
 		// https://bybit-exchange.github.io/docs/v5/order/create-order
 		
-    	if(TradingviewOrderReq.OrderAction.buy != tvOrder.getOrderAction() || TradingviewOrderReq.OrderAction.sell != tvOrder.getOrderAction()) {
-        	throw new RuntimeException("Invaild order_mode parameter.([buy, sell])");
-    	}
+//    	if(TradingviewOrderReq.OrderAction.buy != TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction()) 
+//    			|| TradingviewOrderReq.OrderAction.sell != TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction())) {
+//        	throw new RuntimeException("Invaild order_mode parameter.([buy, sell])");
+//    	}
     	
 		String timestamp = Long.toString(ZonedDateTime.now().toInstant().toEpochMilli());
 
+        TradeData data1 = tradeRepository.findById(data.getTradeNum()).orElseThrow(IllegalArgumentException::new);
+        data1.setReqTime(timestamp);
+
         Map<String, Object> map = new HashMap<>();
         map.put("category", "linear");
-        map.put("symbol", tvOrder.getOrderSymbol());
-        map.put("side", tvOrder.getOrderAction());
+        map.put("symbol", data.getOrderSymbol());
+        map.put("side", data.getOrderAction());
         map.put("orderType", "Market");
-        map.put("qty", tvOrder.getOrderSize());
-        map.put("reduceOnly", "true");
+        map.put("qty", data.getOrderSize());
+        if(data.getTpPrice() != null) {
+        	map.put("takeProfit", data.getTpPrice());
+        }
+        
+//        map.put("reduceOnly", "true");
         
 
     	/*
@@ -147,37 +174,41 @@ Used to identify positions in different position modes. Under hedge-mode, this p
 1: hedge-mode Buy side
 2: hedge-mode Sell side
     	 */
-        if(TradingviewOrderReq.OrderMode.hedge == tvOrder.getOrderMode()) {
-        	if(TradingviewOrderReq.OrderAction.buy == tvOrder.getOrderAction()) {
+        if("hedge".equals(data.getOrderMode())) {
+        	if(TradingviewOrderReq.OrderAction.buy == TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction())) {
             	map.put("positionIdx", Integer.valueOf(1));
-        	} else if(TradingviewOrderReq.OrderAction.sell == tvOrder.getOrderAction()) {
+        	} else if(TradingviewOrderReq.OrderAction.sell == TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction())) {
             	map.put("positionIdx", Integer.valueOf(2));
         	}
-        } else if(TradingviewOrderReq.OrderMode.oneway == tvOrder.getOrderMode()) {
+        } else if("oneway".equals(data.getOrderMode())) {
         	map.put("positionIdx", Integer.valueOf(0));
         } else {
         	throw new RuntimeException("Invaild order_mode parameter.([hedge, oneway])");
         }
         
 
-        String signature = genPostSign(tvOrder.getAuthKeyObj().getApiKey(), tvOrder.getAuthKeyObj().getApiSecret(), timestamp, map);
+        String signature = genPostSign(authKeyObj.getApiKey(), authKeyObj.getApiSecret(), timestamp, map);
 //        String jsonMap = JSON.toJSONString(map);
 
-		String res = 
+        String res = 
 				sslWebClient
 				.post()
 				.uri(domain + "/v5/order/create")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.header("X-BAPI-API-KEY", tvOrder.getAuthKeyObj().getApiKey())
-				.header("X-BAPI-SIGN", "")
-				.header("X-BAPI-SIGN-TYPE", "2")
+				.header("X-BAPI-API-KEY", authKeyObj.getApiKey())
+				.header("X-BAPI-SIGN", signature)
+//				.header("X-BAPI-SIGN-TYPE", "2")
 				.header("X-BAPI-TIMESTAMP", timestamp)
 				.header("X-BAPI-RECV-WINDOW", RECV_WINDOW)
 				.bodyValue(map)
 				.retrieve()
 				.bodyToMono(String.class)
 				.block();
+		
+        data1.setResponse(res, Long.toString(ZonedDateTime.now().toInstant().toEpochMilli()));
+        
+        
 /*
 {
     "retCode": 0,
@@ -209,7 +240,8 @@ Used to identify positions in different position modes. Under hedge-mode, this p
     	}
     }
 
-    private String genGetSign(String apiKey, String apiSecret, String timestamp, Map<String, Object> params) {
+    @SuppressWarnings("unused")
+	private String genGetSign(String apiKey, String apiSecret, String timestamp, Map<String, Object> params) {
     	try {
             StringBuilder sb = genQueryStr(params);
             String queryStr = timestamp + apiKey + RECV_WINDOW + sb;

@@ -1,6 +1,5 @@
-package ai.withtrade.api.web.entity;
+package ai.trading4u.api.web.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -136,8 +135,6 @@ public class TradingviewOrderReq {
 	
 	public enum OrderCategory {future}	// {spot, future}
 	
-	public enum OrderMode {oneway, hedge}
-
 	public enum OrderAction {buy, sell}
 
 	@JsonProperty(value = "auth_key")
@@ -159,22 +156,25 @@ public class TradingviewOrderReq {
 	OrderCategory orderCategory;
 
 	@JsonProperty(value = "order_mode")
-	OrderMode orderMode;
-
-	@JsonProperty(value = "order_size")
-	String orderSize;
-
-	@JsonProperty(value = "order_action")
-	OrderAction orderAction;
+	String orderMode;
 
 	@JsonProperty(value = "order_symbol")
 	String orderSymbol;
 
-	@JsonIgnore
-	AuthKey authKeyObj;
-	
-	public void setAuthKey(String authKey) {
-		this.authKey = authKey;
-		this.authKeyObj = AuthKey.getAuthKey(authKey);
-	}
+	@JsonProperty(value = "order_action")
+	OrderAction orderAction;
+
+	@JsonProperty(value = "order_size")
+	String orderSize;
+
+	@JsonProperty(value = "tp_price")
+	String tpPrice;
+
+//	@JsonIgnore
+//	AuthKey authKeyObj;
+//	
+//	public void setAuthKey(String authKey) {
+//		this.authKey = authKey;
+//		this.authKeyObj = AuthKey.getAuthKey(authKey);
+//	}
 }

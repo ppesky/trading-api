@@ -1,4 +1,4 @@
-package ai.withtrade.api;
+package ai.trading4u.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
