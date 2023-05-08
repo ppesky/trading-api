@@ -1,8 +1,10 @@
 package ai.trading4u.api.web.entity;
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class AuthKey {
 	
 	public AuthKey(String exchangeName, String apiKey, String apiSecret) {
@@ -27,11 +29,11 @@ public class AuthKey {
 	String authKeyStr;
 	
 	public String getComputeString() {
-		return exchangeName + "|" + apiKey + "|" + apiSecret;
+		return exchangeName + ";" + apiKey + ";" + apiSecret;
 	}
 	
 	public static AuthKey getAuthKey(String authKeyStr, String computeString) {
-		String [] arr = computeString.split("|", 3);
+		String [] arr = computeString.split(";", 3);
 		return new AuthKey(arr [0], arr [1], arr [2], authKeyStr);
 	}
 

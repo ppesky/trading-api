@@ -6,9 +6,11 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import ai.trading4u.api.Base58;
 import ai.trading4u.api.web.entity.AuthKey;
 
 @Service
@@ -50,7 +52,9 @@ public class AuthKeyService {
 			Cipher cipher = Cipher.getInstance(algorithmTransformation);
 			cipher.init(Cipher.ENCRYPT_MODE, skey);
 			byte[] b = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
-			return Base64.encodeBase64String(b);
+//			return Base64.encodeBase64String(b);
+//			return Hex.encodeHexString(b);
+			return Base58.encode(b);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -61,7 +65,9 @@ public class AuthKeyService {
 		try {
 			Cipher cipher = Cipher.getInstance(algorithmTransformation);
 			cipher.init(Cipher.DECRYPT_MODE, skey);
-			byte[] b = cipher.doFinal(Base64.decodeBase64(decryptText));
+//			byte[] b = cipher.doFinal(Base64.decodeBase64(decryptText));
+//			byte[] b = cipher.doFinal(Hex.decodeHex(decryptText));
+			byte[] b = cipher.doFinal(Base58.decode(decryptText));
 			return new String(b, StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

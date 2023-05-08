@@ -58,7 +58,7 @@ public class ExchangeService {
 //	@Scheduled(fixedDelay = 1000, initialDelay = 3000) // fixedDelay : milliseconds 단위로, 이전 Task의 종료 시점으로부터 정의된 시간만큼 지난 후 Task를 실행한다.
 	public void scheduledCallBybitApi() {
 		while(true) {
-			List<TradeData> targetSymbolList = tradeRepository.findDistinctByExchangeNameBytradeReqTimeIsNull(TradingviewOrderReq.OrderExchange.BYBIT);
+			List<TradeData> targetSymbolList = tradeRepository.findDistinctByReqExchangeBytradeReqTimeIsNull(TradingviewOrderReq.OrderExchange.BYBIT.name());
 			if(targetSymbolList == null || targetSymbolList.size() == 0) {
 				break;
 			}
@@ -88,8 +88,8 @@ public class ExchangeService {
 	
 	@Async("bybitExecutor")
 	public CompletableFuture<Boolean> requestBybit(AuthKey authKeyObj, String orderSymbol) {
-		List<TradeData> dataList = tradeRepository.findByExchangeNameAndAuthKeyAndOrderSymbolOrderByTradeNumAsc(
-				TradingviewOrderReq.OrderExchange.BYBIT, authKeyObj.getAuthKeyStr(), orderSymbol);
+		List<TradeData> dataList = tradeRepository.findByReqExchangeAndAuthKeyAndOrderSymbolOrderByTradeNumAsc(
+				TradingviewOrderReq.OrderExchange.BYBIT.name(), authKeyObj.getAuthKeyStr(), orderSymbol);
 		for(TradeData data : dataList) {
 			bybitService.placeOrder(authKeyObj, data);
 		}
