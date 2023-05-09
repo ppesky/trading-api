@@ -36,7 +36,7 @@ class ExchangeServiceTest {
 				"order_exchange" : "BYBIT",
 				"order_category" : "future",
 				"order_mode" : "oneway",
-				"order_symbol" : "GPTUSDT.P",
+				"order_symbol" : "IDUSDT.P",
 				"order_action" : "buy",
 				"order_size" : "1"
 			}
@@ -51,7 +51,7 @@ class ExchangeServiceTest {
 				"order_exchange" : "BYBIT",
 				"order_category" : "future",
 				"order_mode" : "oneway",
-				"order_symbol" : "GPTUSDT.P",
+				"order_symbol" : "IDUSDT.P",
 				"order_action" : "sell",
 				"order_size" : "1"
 			}
@@ -66,7 +66,7 @@ class ExchangeServiceTest {
 				"order_exchange" : "BYBIT",
 				"order_category" : "future",
 				"order_mode" : "oneway",
-				"order_symbol" : "GPTUSDT.P",
+				"order_symbol" : "IDUSDT.P",
 				"order_action" : "sell",
 				"order_size" : "1"
 			}
@@ -81,7 +81,7 @@ class ExchangeServiceTest {
 				"order_exchange" : "BYBIT",
 				"order_category" : "future",
 				"order_mode" : "oneway",
-				"order_symbol" : "GPTUSDT.P",
+				"order_symbol" : "IDUSDT.P",
 				"order_action" : "buy",
 				"order_size" : "1"
 			}
@@ -97,13 +97,15 @@ class ExchangeServiceTest {
 		TradingviewOrderReq tvOrderLongClose = objectMapper.readValue(onewayLongClose, TradingviewOrderReq.class);
 		TradingviewOrderReq tvOrderShortSell = objectMapper.readValue(onewayShortSell, TradingviewOrderReq.class);
 		TradingviewOrderReq tvOrderShortClose = objectMapper.readValue(onewayShortClose, TradingviewOrderReq.class);
-		
-		exchangeService.saveRequest(tvOrderLongBuy);
-		exchangeService.saveRequest(tvOrderLongClose);
-		exchangeService.saveRequest(tvOrderShortSell);
-		exchangeService.saveRequest(tvOrderShortClose);
-		
+
+		for(int i=0; i<10; i++) {
+			exchangeService.saveRequest(tvOrderLongBuy);
+			exchangeService.saveRequest(tvOrderLongClose);
+			exchangeService.saveRequest(tvOrderShortSell);
+			exchangeService.saveRequest(tvOrderShortClose);
+		}
 	}
+	
 	
 	
 	String hedgeLongBuy = """
@@ -175,14 +177,17 @@ class ExchangeServiceTest {
 		TradingviewOrderReq tvOrderLongClose = objectMapper.readValue(hedgeLongClose, TradingviewOrderReq.class);
 		TradingviewOrderReq tvOrderShortSell = objectMapper.readValue(hedgeShortSell, TradingviewOrderReq.class);
 		TradingviewOrderReq tvOrderShortClose = objectMapper.readValue(hedgeShortClose, TradingviewOrderReq.class);
-		
-		exchangeService.saveRequest(tvOrderLongBuy);
-		exchangeService.saveRequest(tvOrderShortSell);
-		exchangeService.saveRequest(tvOrderLongClose);
-		exchangeService.saveRequest(tvOrderShortClose);
+
+		for(int i=0; i<10; i++) {
+			exchangeService.saveRequest(tvOrderLongBuy);
+			exchangeService.saveRequest(tvOrderShortSell);
+			exchangeService.saveRequest(tvOrderLongClose);
+			exchangeService.saveRequest(tvOrderShortClose);
+		}
 		
 	}
-	
+
+	@Disabled
 	@Test
 	void test3() {
 		exchangeService.scheduledCallBybitApi();

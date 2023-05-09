@@ -1,5 +1,10 @@
 package ai.trading4u.api.service.domain.entity;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,7 +37,7 @@ public class TradeData {
 		this.orderSize = orderSize;
 		this.tpPrice = tpPrice;
 		this.reqData = reqData;
-		this.createTime = new java.sql.Timestamp(System.currentTimeMillis());
+		this.createTime = Instant.now().atZone(ZoneId.of("UTC")).toString();
 	}
 	
 	@Id
@@ -63,22 +68,19 @@ public class TradeData {
 	
 	String resData;
 	
-	@Temporal(TemporalType.TIMESTAMP)
-	java.sql.Timestamp createTime;
+	String createTime;
 	
-	@Temporal(TemporalType.TIMESTAMP)
-	java.sql.Timestamp reqTime;
+	String reqTime;
 	
-	@Temporal(TemporalType.TIMESTAMP)
-	java.sql.Timestamp resTime;
+	String resTime;
 	
 	public void resetReqTimeForCurrent() {
-		this.reqTime = new java.sql.Timestamp(System.currentTimeMillis());
+		this.reqTime = Instant.now().atZone(ZoneId.of("UTC")).toString();
 	}
 	
 	public void setResponse(String resData) {
 		this.resData = resData;
-		this.resTime = new java.sql.Timestamp(System.currentTimeMillis());
+		this.resTime = Instant.now().atZone(ZoneId.of("UTC")).toString();
 	}
 	
 	public String getOrderSymbolForBybit() {

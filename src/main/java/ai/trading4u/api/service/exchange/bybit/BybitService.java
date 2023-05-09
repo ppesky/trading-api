@@ -147,10 +147,19 @@ public class BybitService {
 	public CompletableFuture<String> requestBybit(AuthKey authKeyObj, String orderSymbol) {
 		List<TradeData> dataList = tradeRepository.findByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(
 				TradingviewOrderReq.OrderExchange.BYBIT.name(), authKeyObj.getAuthKeyStr(), orderSymbol);
+		
+//		https://bybit-exchange.github.io/docs/v5/rate-limit#api-rate-limit-table
 		String nums = "";
 		for(TradeData data : dataList) {
 			nums += data.getTradeNum() + " ";
 			placeOrder(authKeyObj, data);
+			
+			try {
+				// 같은 종목의 주문은 0.5초 대기~
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				log.error(e.getMessage());
+			}
 		}
 		
 		return CompletableFuture.completedFuture(nums);
