@@ -232,7 +232,7 @@ public class BybitService {
 	        	map.put("reduceOnly", true);
 	        	map.put("closeOnTrigger", true);
 	        } else {
-	            if(data.getTpPrice() != null) {
+	            if(StringUtils.hasText(data.getTpPrice())) {
 	            	map.put("takeProfit", data.getTpPrice());
 	            }
 	        }

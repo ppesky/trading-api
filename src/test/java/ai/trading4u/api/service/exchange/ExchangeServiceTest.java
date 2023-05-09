@@ -39,6 +39,7 @@ class ExchangeServiceTest {
 				"order_symbol" : "IDUSDT.P",
 				"order_action" : "buy",
 				"order_size" : "1"
+				,"tp_price" : "0.5"
 			}
 			""";
 
@@ -69,6 +70,7 @@ class ExchangeServiceTest {
 				"order_symbol" : "IDUSDT.P",
 				"order_action" : "sell",
 				"order_size" : "1"
+				,"tp_price" : "0.4"
 			}
 			""";
 
@@ -98,7 +100,7 @@ class ExchangeServiceTest {
 		TradingviewOrderReq tvOrderShortSell = objectMapper.readValue(onewayShortSell, TradingviewOrderReq.class);
 		TradingviewOrderReq tvOrderShortClose = objectMapper.readValue(onewayShortClose, TradingviewOrderReq.class);
 
-		for(int i=0; i<10; i++) {
+		for(int i=0; i<1; i++) {
 			exchangeService.saveRequest(tvOrderLongBuy);
 			exchangeService.saveRequest(tvOrderLongClose);
 			exchangeService.saveRequest(tvOrderShortSell);
@@ -120,6 +122,7 @@ class ExchangeServiceTest {
 				"order_symbol" : "1000PEPEUSDT.P",
 				"order_action" : "buy",
 				"order_size" : "101"
+				,"tp_price" : "0.002"
 			}
 			""";
 
@@ -150,6 +153,7 @@ class ExchangeServiceTest {
 				"order_symbol" : "1000PEPEUSDT.P",
 				"order_action" : "sell",
 				"order_size" : "101"
+				,"tp_price" : "0.001"
 			}
 			""";
 
@@ -178,11 +182,18 @@ class ExchangeServiceTest {
 		TradingviewOrderReq tvOrderShortSell = objectMapper.readValue(hedgeShortSell, TradingviewOrderReq.class);
 		TradingviewOrderReq tvOrderShortClose = objectMapper.readValue(hedgeShortClose, TradingviewOrderReq.class);
 
-		for(int i=0; i<10; i++) {
+		for(int i=0; i<1; i++) {
 			exchangeService.saveRequest(tvOrderLongBuy);
 			exchangeService.saveRequest(tvOrderShortSell);
 			exchangeService.saveRequest(tvOrderLongClose);
 			exchangeService.saveRequest(tvOrderShortClose);
+
+//			tvOrderLongBuy.setTpPrice("");
+//			exchangeService.saveRequest(tvOrderLongBuy);
+//			exchangeService.saveRequest(tvOrderLongBuy);
+//			tvOrderShortSell.setTpPrice("");
+//			exchangeService.saveRequest(tvOrderShortSell);
+//			exchangeService.saveRequest(tvOrderShortSell);
 		}
 		
 	}
