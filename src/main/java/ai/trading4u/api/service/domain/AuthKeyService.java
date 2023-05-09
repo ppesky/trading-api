@@ -5,20 +5,21 @@ import java.nio.charset.StandardCharsets;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import ai.trading4u.api.Base58;
 import ai.trading4u.api.web.entity.AuthKey;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class AuthKeyService {
 	
 	private String internalKey = "Tbe_rhJ#nw$9Aahj";
 	
 	public String generateKey(AuthKey authKey) {
+		log.info(authKey.getApiKey() + " generate.");
 		return encrypt(authKey.getComputeString());
 	}
 	

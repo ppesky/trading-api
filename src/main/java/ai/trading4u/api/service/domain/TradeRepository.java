@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import ai.trading4u.api.service.domain.entity.TradeData;
+import ai.trading4u.api.service.domain.entity.TradeDataDto;
 
 public interface TradeRepository extends JpaRepository<TradeData, Long> {
 	
@@ -15,14 +17,14 @@ public interface TradeRepository extends JpaRepository<TradeData, Long> {
 				auth_key AS authKey, 
 				order_symbol AS orderSymbol
 			  FROM trade_data
-			 WHERE req_exchange = ?1
+			 WHERE req_exchange = :reqExchange
 			   AND req_time IS NULL
 			"""
 	        , nativeQuery = true
 	)
-	List<TradeData> findDistinctByReqExchangeBytradeReqTimeIsNull(String reqExchange);
+	List<TradeDataDto.AuthKeyAndSymbol> findDistinctByReqExchangeReqTimeIsNull(@Param("reqExchange") String reqExchange);
 
-	List<TradeData> findByReqExchangeAndAuthKeyAndOrderSymbolOrderByTradeNumAsc(String reqExchange, String authKey, String orderSymbol);
+	List<TradeData> findByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(String reqExchange, String authKey, String orderSymbol);
 
 //	List<TradeData> findTop100ByAuthKeyOrderByTradeNumDesc(String authKey); // limit 100, 역순
 

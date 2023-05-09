@@ -3,16 +3,20 @@ package ai.trading4u.api.service.exchange.bybit;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,8 +37,13 @@ public class BybitService {
 	 * 	https://api.bybit.com
 	 * 	https://api.bytick.com
 	 */
+
+	/*
+	 * https://bybit-exchange.github.io/docs/v5/order/create-order
+	 * https://github.com/bybit-exchange/api-usage-examples/blob/master/V3_demo/api_demo/unified_margin/Encryption_HMAC.java
+	 */
 	
-	final String domain = "https://api-testnet.bybit.com";
+	final String domain = "https://api.bybit.com";
 	
 	final String RECV_WINDOW = "5000";
 	
@@ -132,14 +141,25 @@ public class BybitService {
 }
 		 */
 	}
+
+	@Async("bybitExecutor")
+	@Transactional
+	public CompletableFuture<String> requestBybit(AuthKey authKeyObj, String orderSymbol) {
+		List<TradeData> dataList = tradeRepository.findByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(
+				TradingviewOrderReq.OrderExchange.BYBIT.name(), authKeyObj.getAuthKeyStr(), orderSymbol);
+		String nums = "";
+		for(TradeData data : dataList) {
+			nums += data.getTradeNum() + " ";
+			placeOrder(authKeyObj, data);
+		}
+		
+		return CompletableFuture.completedFuture(nums);
+	}
 	
-	/**
-	 * https://bybit-exchange.github.io/docs/v5/order/create-order
-	 * https://github.com/bybit-exchange/api-usage-examples/blob/master/V3_demo/api_demo/unified_margin/Encryption_HMAC.java
-	 * @param tvOrder
-	 */
 	@Transactional
 	public void placeOrder(AuthKey authKeyObj, TradeData data) {
+		log.debug(data.getTradeNum() + " start.");
+		
 		// 포지션 open/close - Trade > Place Order (/v5/order/create) 
 		// https://bybit-exchange.github.io/docs/v5/order/create-order
 		
@@ -147,80 +167,89 @@ public class BybitService {
 //    			|| TradingviewOrderReq.OrderAction.sell != TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction())) {
 //        	throw new RuntimeException("Invaild order_mode parameter.([buy, sell])");
 //    	}
-    	
-		String timestamp = Long.toString(ZonedDateTime.now().toInstant().toEpochMilli());
 
         TradeData data1 = tradeRepository.findById(data.getTradeNum()).orElseThrow(IllegalArgumentException::new);
-        data1.setReqTime(timestamp);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("category", "linear");
-        map.put("symbol", data.getOrderSymbol());
-        map.put("side", data.getOrderAction());
-        map.put("orderType", "Market");
-        map.put("qty", data.getOrderSize());
-        if(data.getTpPrice() != null) {
-        	map.put("takeProfit", data.getTpPrice());
+		String res = "";
+        try {
+			String timestamp = Long.toString(ZonedDateTime.now().toInstant().toEpochMilli());
+	
+	        data1.resetReqTimeForCurrent();
+	
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("category", "linear");
+	        map.put("symbol", data.getOrderSymbolForBybit());
+	        map.put("side", StringUtils.capitalize(data.getOrderAction()));
+	        map.put("orderType", "Market");
+	        map.put("qty", data.getOrderSize());
+	        
+	    	/*
+	positionIdx	false	integer	
+	Used to identify positions in different position modes. Under hedge-mode, this param is required
+	
+	0: one-way mode
+	1: hedge-mode Buy side
+	2: hedge-mode Sell side
+	    	 */
+	        
+	        boolean isClose = false;
+	        if(data.getOrderName().toUpperCase().contains("TAKE")
+	        		|| data.getOrderName().toUpperCase().contains("EXIT")
+	        		|| data.getOrderName().toUpperCase().contains("CLOSE")) {
+	        	isClose = true;
+	        }
+	        
+	        
+	        if("hedge".equals(data.getOrderMode())) {
+	        	if(TradingviewOrderReq.OrderAction.buy == TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction())) {
+	            	if(!isClose) {
+	            		map.put("positionIdx", Integer.valueOf(1));
+	            	} else {
+	            		map.put("positionIdx", Integer.valueOf(2));
+	            	}
+	        	} else if(TradingviewOrderReq.OrderAction.sell == TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction())) {
+	            	if(!isClose) {
+	            		map.put("positionIdx", Integer.valueOf(2));
+	            	} else {
+	            		map.put("positionIdx", Integer.valueOf(1));
+	            	}
+	        	}
+	        } else if("oneway".equals(data.getOrderMode())) {
+	        	map.put("positionIdx", Integer.valueOf(0));
+	        } else {
+	        	throw new RuntimeException("Invaild order_mode parameter.([hedge, oneway])");
+	        }
+	        
+	        if(isClose) {
+	        	map.put("reduceOnly", true);
+	        	map.put("closeOnTrigger", true);
+	        } else {
+	            if(data.getTpPrice() != null) {
+	            	map.put("takeProfit", data.getTpPrice());
+	            }
+	        }
+	
+	        String signature = genPostSign(authKeyObj.getApiKey(), authKeyObj.getApiSecret(), timestamp, map);
+	//        String jsonMap = JSON.toJSONString(map);
+	
+	        res = sslWebClient
+	        		.post()
+    				.uri(domain + "/v5/order/create")
+    				.contentType(MediaType.APPLICATION_JSON)
+    				.accept(MediaType.APPLICATION_JSON)
+    				.header("X-BAPI-API-KEY", authKeyObj.getApiKey())
+    				.header("X-BAPI-SIGN", signature)
+//    				.header("X-BAPI-SIGN-TYPE", "2")
+    				.header("X-BAPI-TIMESTAMP", timestamp)
+    				.header("X-BAPI-RECV-WINDOW", RECV_WINDOW)
+    				.bodyValue(map)
+    				.retrieve()
+    				.bodyToMono(String.class)
+    				.block();
+        } catch (Exception e) {
+        	data1.setResponse("{\"retCode\": -1, \"retMsg\":\"" + e.getMessage() + "\"}");
+		} finally {
+			data1.setResponse(res);
         }
-        
-//        map.put("reduceOnly", "true");
-        
-
-    	/*
-positionIdx	false	integer	
-Used to identify positions in different position modes. Under hedge-mode, this param is required
-
-0: one-way mode
-1: hedge-mode Buy side
-2: hedge-mode Sell side
-    	 */
-        if("hedge".equals(data.getOrderMode())) {
-        	if(TradingviewOrderReq.OrderAction.buy == TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction())) {
-            	map.put("positionIdx", Integer.valueOf(1));
-        	} else if(TradingviewOrderReq.OrderAction.sell == TradingviewOrderReq.OrderAction.valueOf(data.getOrderAction())) {
-            	map.put("positionIdx", Integer.valueOf(2));
-        	}
-        } else if("oneway".equals(data.getOrderMode())) {
-        	map.put("positionIdx", Integer.valueOf(0));
-        } else {
-        	throw new RuntimeException("Invaild order_mode parameter.([hedge, oneway])");
-        }
-        
-
-        String signature = genPostSign(authKeyObj.getApiKey(), authKeyObj.getApiSecret(), timestamp, map);
-//        String jsonMap = JSON.toJSONString(map);
-
-        String res = 
-				sslWebClient
-				.post()
-				.uri(domain + "/v5/order/create")
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
-				.header("X-BAPI-API-KEY", authKeyObj.getApiKey())
-				.header("X-BAPI-SIGN", signature)
-//				.header("X-BAPI-SIGN-TYPE", "2")
-				.header("X-BAPI-TIMESTAMP", timestamp)
-				.header("X-BAPI-RECV-WINDOW", RECV_WINDOW)
-				.bodyValue(map)
-				.retrieve()
-				.bodyToMono(String.class)
-				.block();
-		
-        data1.setResponse(res, Long.toString(ZonedDateTime.now().toInstant().toEpochMilli()));
-        
-        
-/*
-{
-    "retCode": 0,
-    "retMsg": "OK",
-    "result": {
-        "orderId": "1321003749386327552",
-        "orderLinkId": "spot-test-postonly"
-    },
-    "retExtInfo": {},
-    "time": 1672211918471
-}
- */
 	}
 
 	

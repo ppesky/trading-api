@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@ToString
+@ToString(exclude = "apiSecret")
 public class AuthKey {
 	
 	public AuthKey(String exchangeName, String apiKey, String apiSecret) {

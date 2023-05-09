@@ -15,10 +15,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ai.trading4u.api.service.domain.AuthKeyService;
 import ai.trading4u.api.service.domain.TradeRepository;
 import ai.trading4u.api.service.domain.entity.TradeData;
+import ai.trading4u.api.service.domain.entity.TradeDataDto;
 import ai.trading4u.api.service.exchange.bybit.BybitService;
 import ai.trading4u.api.web.entity.AuthKey;
 import ai.trading4u.api.web.entity.TradingviewOrderReq;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class ExchangeService {
 	
@@ -46,6 +49,7 @@ public class ExchangeService {
 				tvOrder.getOrderExchange().name(), 
 				tvOrder.getOrderSymbol(), 
 				tvOrder.getOrderMode(),
+				tvOrder.getOrderId(),
 				tvOrder.getOrderAction().name(),
 				tvOrder.getOrderSize(),
 				tvOrder.getTpPrice(),
@@ -58,7 +62,7 @@ public class ExchangeService {
 //	@Scheduled(fixedDelay = 1000, initialDelay = 3000) // fixedDelay : milliseconds 단위로, 이전 Task의 종료 시점으로부터 정의된 시간만큼 지난 후 Task를 실행한다.
 	public void scheduledCallBybitApi() {
 		while(true) {
-			List<TradeData> targetSymbolList = tradeRepository.findDistinctByReqExchangeBytradeReqTimeIsNull(TradingviewOrderReq.OrderExchange.BYBIT.name());
+			List<TradeDataDto.AuthKeyAndSymbol> targetSymbolList = tradeRepository.findDistinctByReqExchangeReqTimeIsNull(TradingviewOrderReq.OrderExchange.BYBIT.name());
 			if(targetSymbolList == null || targetSymbolList.size() == 0) {
 				break;
 			}
@@ -66,36 +70,29 @@ public class ExchangeService {
 		}
 	}
 	
-	public void callBybitApi(List<TradeData> targetSymbolList) {
+	public void callBybitApi(List<TradeDataDto.AuthKeyAndSymbol> targetSymbolList) {
 		// 여기서 db 읽어서 계정별 종목별 비동기 api 호출
 		
-		List<CompletableFuture<Boolean>> futures = new ArrayList<>();
-		for(TradeData targetSymboldata : targetSymbolList) {
+		List<CompletableFuture<String>> futures = new ArrayList<>();
+		for(TradeDataDto.AuthKeyAndSymbol targetSymboldata : targetSymbolList) {
 			
 			// 계정별 종목별 async thread 시작~
 			AuthKey authKeyObj = authKeyService.resolveKey(targetSymboldata.getAuthKey());
-			CompletableFuture<Boolean> future = requestBybit(authKeyObj, targetSymboldata.getOrderSymbol());
+			CompletableFuture<String> future = bybitService.requestBybit(authKeyObj, targetSymboldata.getOrderSymbol());
 			futures.add(future);
 		}
 		
-		CompletableFuture.allOf(futures.toArray(
+		List<String> retList = CompletableFuture.allOf(futures.toArray(
 				new CompletableFuture[futures.size()])
 				).thenApply(
 						result -> futures.stream().map(future -> future.join()).collect(Collectors.toList())
 						)
 		.join();
+		
+		for(String s : retList) {
+			log.debug(s);
+		}
 	}
 	
-	@Async("bybitExecutor")
-	public CompletableFuture<Boolean> requestBybit(AuthKey authKeyObj, String orderSymbol) {
-		List<TradeData> dataList = tradeRepository.findByReqExchangeAndAuthKeyAndOrderSymbolOrderByTradeNumAsc(
-				TradingviewOrderReq.OrderExchange.BYBIT.name(), authKeyObj.getAuthKeyStr(), orderSymbol);
-		for(TradeData data : dataList) {
-			bybitService.placeOrder(authKeyObj, data);
-		}
-		
-		return CompletableFuture.completedFuture(true);
-	}
-
 	
 }
