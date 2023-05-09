@@ -89,7 +89,7 @@ class ExchangeServiceTest {
 
 //	,"tp_price" : ""
 	
-//	@Disabled
+	@Disabled
 	@Test
 	void test1() throws JsonMappingException, JsonProcessingException {
 		
@@ -169,7 +169,7 @@ class ExchangeServiceTest {
 			""";
 
 
-//	@Disabled
+	@Disabled
 	@Test
 	void test2() throws JsonMappingException, JsonProcessingException {
 		

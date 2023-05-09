@@ -20,9 +20,18 @@ public class AuthKeyService {
 	
 	public String generateKey(AuthKey authKey) {
 		log.info(authKey.getApiKey() + " generate.");
+		if(authKey.getComputeString() == null) {
+			return null;
+		}
 		return encrypt(authKey.getComputeString());
 	}
-	
+
+	@Cacheable(cacheNames = "temp", key="{#exchangeName, #apiKey, #apiSecret}")
+	public String getAuthKey(String exchangeName, String apiKey, String apiSecret) {
+		AuthKey authKey = new AuthKey(exchangeName, apiKey, apiSecret);
+		return generateKey(authKey);
+	}
+
 	@Cacheable(cacheNames = "authkey")
 	public AuthKey resolveKey(String authKeyStr) {
 		String computeString = decrypt(authKeyStr);

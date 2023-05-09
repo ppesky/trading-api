@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,13 +59,15 @@ public class ExchangeService {
 		
 	}
 	
-//	@Scheduled(fixedDelay = 1000, initialDelay = 3000) // fixedDelay : milliseconds 단위로, 이전 Task의 종료 시점으로부터 정의된 시간만큼 지난 후 Task를 실행한다.
+	// fixedDelay : milliseconds 단위로, 이전 Task의 종료 시점으로부터 정의된 시간만큼 지난 후 Task를 실행한다.
+	@Scheduled(fixedDelay = 1000, initialDelay = 3000)
 	public void scheduledCallBybitApi() {
 		while(true) {
 			List<TradeDataDto.AuthKeyAndSymbol> targetSymbolList = tradeRepository.findDistinctByReqExchangeReqTimeIsNull(TradingviewOrderReq.OrderExchange.BYBIT.name());
 			if(targetSymbolList == null || targetSymbolList.size() == 0) {
 				break;
 			}
+			log.info("scheduled Call BybitApi. count = " + targetSymbolList.size());
 			callBybitApi(targetSymbolList);
 		}
 	}
