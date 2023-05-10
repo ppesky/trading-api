@@ -26,14 +26,14 @@ public class AuthKeyService {
 		return encrypt(authKey.getComputeString());
 	}
 
-	@Cacheable(cacheNames = "exchange_key", key="{#exchangeName, #apiKey}")
+	@Cacheable(cacheNames = "exchange_key", key="{#exchangeName, #apiKey}", unless="#result == null")
 	public String getAuthKeyStr(String exchangeName, String apiKey, String apiSecret) {
 		log.info("getAuthKeyStr = " + exchangeName +","+ apiKey);
 		AuthKey authKey = new AuthKey(exchangeName, apiKey, apiSecret);
 		return generateKey(authKey);
 	}
 
-	@Cacheable(cacheNames = "auth_key")
+	@Cacheable(cacheNames = "auth_key", unless="#result == null")
 	public AuthKey resolveKey(String authKeyStr) {
 		log.info("resolveKey = " + authKeyStr);
 		String computeString = decrypt(authKeyStr);

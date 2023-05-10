@@ -11,12 +11,12 @@ public class AllowedAccountService {
 	
 	@Autowired AllowedAccountRepository allowedAccountRepository;
 	
-	@Cacheable(cacheNames = "allowed_account")
+	@Cacheable(cacheNames = "allowed_account", unless="#result == null")
 	public boolean isAllowedAccount(String allowedType, String allowedName) {
 		
 		AllowedAccount allowedAccount = allowedAccountRepository.findByAllowedTypeAndAllowedName(allowedType, allowedName);
 		
-		return allowedAccount == null;
+		return allowedAccount != null;
 	}
 
 }
