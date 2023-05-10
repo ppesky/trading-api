@@ -122,7 +122,7 @@ class ExchangeServiceTest {
 				"order_symbol" : "1000PEPEUSDT.P",
 				"order_action" : "buy",
 				"order_size" : "101"
-				,"tp_price" : "0.002"
+				,"tp_price" : "1;0.002"
 			}
 			""";
 
@@ -153,7 +153,7 @@ class ExchangeServiceTest {
 				"order_symbol" : "1000PEPEUSDT.P",
 				"order_action" : "sell",
 				"order_size" : "101"
-				,"tp_price" : "0.001"
+				,"tp_price" : "1;0.001"
 			}
 			""";
 
