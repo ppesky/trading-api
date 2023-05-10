@@ -7,6 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import ai.trading4u.api.Base58;
 import ai.trading4u.api.web.entity.AuthKey;
@@ -20,10 +21,10 @@ public class AuthKeyService {
 	
 	public String generateKey(AuthKey authKey) {
 		log.info(authKey.getExchangeName() + " - " + authKey.getApiKey() + " generate.");
-		if(authKey.getComputeString() == null) {
-			return null;
+		if(StringUtils.hasText(authKey.getComputeString())) {
+			return encrypt(authKey.getComputeString());
 		}
-		return encrypt(authKey.getComputeString());
+		return null;
 	}
 
 	@Cacheable(cacheNames = "exchange_key", key="{#exchangeName, #apiKey}", unless="#result == null")

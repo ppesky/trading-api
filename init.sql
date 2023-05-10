@@ -24,10 +24,13 @@ COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE allowed_account (
 	allowed_num BIGINT UNSIGNED auto_increment NOT NULL,
-	allowed_type varchar(10) NOT NULL,
+	allowed_type varchar(12) NOT NULL,
 	allowed_name varchar(100) NOT NULL,
 	CONSTRAINT allowed_account_PK PRIMARY KEY (allowed_num)
 )
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
+
+ALTER TABLE allowed_account ADD CONSTRAINT allowed_account_UN UNIQUE KEY (allowed_type,allowed_name);
+

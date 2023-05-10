@@ -1,5 +1,7 @@
 package ai.trading4u.api.web.entity;
 
+import org.springframework.util.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -45,8 +47,11 @@ public class AuthKey {
 	}
 	
 	public static AuthKey getAuthKey(String authKeyStr, String computeString) {
-		String [] arr = computeString.split(";", 3);
-		return new AuthKey(arr [0], arr [1], arr [2], authKeyStr);
+		if(StringUtils.hasText(computeString)) {
+			String [] arr = computeString.split(";", 3);
+			return new AuthKey(arr [0], arr [1], arr [2], authKeyStr);
+		}
+		return null;
 	}
 
 }
