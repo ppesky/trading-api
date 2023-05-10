@@ -2,6 +2,7 @@ package ai.trading4u.api.web;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ai.trading4u.api.service.domain.AuthKeyService;
 import ai.trading4u.api.service.domain.TradeService;
 import ai.trading4u.api.service.domain.entity.TradeData;
+import ai.trading4u.api.service.domain.entity.TradeDataDto;
 import ai.trading4u.api.service.exchange.ExchangeService;
 import ai.trading4u.api.web.entity.AuthKey;
 import ai.trading4u.api.web.entity.Crypto25TvaOrderReq;
@@ -38,8 +40,11 @@ public class TradingviewController {
 	}
 	
 	@GetMapping("/tv/list/{authKey}")
-	public List<TradeData> getTradeData(@PathVariable("authKey") String authKeyStr) {
-		return tradeService.findTop999ByAuthKeyOrderByTradeNumDesc(authKeyStr);
+	public List<TradeDataDto.TradeDataResDto> getTradeData(@PathVariable("authKey") String authKeyStr) {
+		return tradeService.findTop999ByAuthKeyOrderByTradeNumDesc(authKeyStr)
+				.stream()
+				.map(TradeData::fromEntity)
+				.collect(Collectors.toList());
 	}
 	
 	

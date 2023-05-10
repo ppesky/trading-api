@@ -1,16 +1,18 @@
 package ai.trading4u.api.service.domain.entity;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.Map;
+
+import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -90,4 +92,39 @@ public class TradeData {
 		return orderSymbol;
 	}
 
+	public static TradeDataDto.TradeDataResDto fromEntity(TradeData tradeData) {
+		TradeDataDto.TradeDataResDto dto = new TradeDataDto.TradeDataResDto();
+		dto.setTradeNum(tradeData.getTradeNum());
+		dto.setEventName(tradeData.getEventName());
+		dto.setEventTime(tradeData.getEventTime());
+		dto.setReqExchange(tradeData.getReqExchange());
+		dto.setOrderSymbol(tradeData.getOrderSymbol());
+		dto.setOrderMode(tradeData.getOrderMode());
+		dto.setOrderName(tradeData.getOrderName());
+		dto.setOrderAction(tradeData.getOrderAction());
+		dto.setOrderSize(tradeData.getOrderSize());
+		dto.setTpPrice(tradeData.getTpPrice());
+		dto.setCreateTime(tradeData.getCreateTime());
+		dto.setReqTime(tradeData.getReqTime());
+		dto.setResTime(tradeData.getResTime());
+		if(StringUtils.hasText(tradeData.getResData())) {
+			try {
+				
+				ObjectMapper objectMapper = new ObjectMapper();
+			    TypeReference<Map<String, Object>> typeReference = new TypeReference<Map<String,Object>>() {};
+			    Map<String, Object> map = objectMapper.readValue(tradeData.getResData(), typeReference);
+				
+//				Map<String, Object> map = new ObjectMapper().readValue(tradeData.getResData(), Map.class);
+
+	    		dto.setRetCode((Integer) map.get("retCode"));
+	    		dto.setRetMsg((String) map.get("retMsg"));
+	    		
+	        } catch (Exception e) {
+	    		dto.setRetCode(-1);
+	    		dto.setRetMsg("Parsing error.");
+	        }
+		}
+		
+		return dto;
+	}
 }

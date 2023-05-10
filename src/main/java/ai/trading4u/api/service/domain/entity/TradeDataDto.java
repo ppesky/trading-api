@@ -1,18 +1,48 @@
 package ai.trading4u.api.service.domain.entity;
 
-public interface TradeDataDto {
+import lombok.Getter;
+import lombok.Setter;
 
-	interface AuthKeyAndSymbol {
+public class TradeDataDto {
+
+	public interface AuthKeyAndSymbol {
         String getAuthKey();
         String getOrderSymbol();
     }
-	
 
-//	@Getter
-//	@NoArgsConstructor(access = AccessLevel.PROTECTED)
-//	public static class AuthKeyAndSymbol {
-//		String authKey;
-//		String orderSymbol;
-//	}
+	@Getter
+	@Setter
+	public static class TradeDataResDto {
+		
+		Long tradeNum;
+		
+		String eventName;
+		
+		String eventTime;
+		
+		String reqExchange;
+
+		String orderSymbol;
+		
+		String orderMode;
+
+		String orderName;
+		
+		String orderAction;
+		
+		String orderSize;
+		
+		String tpPrice;
+		
+		int retCode;
+
+		String retMsg;
+		
+		String createTime;
+		
+		String reqTime;
+		
+		String resTime;
+	}
 
 }
