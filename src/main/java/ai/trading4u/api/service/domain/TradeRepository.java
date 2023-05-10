@@ -3,6 +3,7 @@ package ai.trading4u.api.service.domain;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,4 +29,13 @@ public interface TradeRepository extends JpaRepository<TradeData, Long> {
 
 	List<TradeData> findTop999ByAuthKeyOrderByTradeNumDesc(String authKey); // limit 999, 역순
 
+	@Modifying
+	@Query(value = 
+			"""
+			DELETE FROM trade_data WHERE create_time < :expiryCreateTime
+			"""
+	        , nativeQuery = true
+	)
+    public void removeByCreateTimeBefore(@Param("expiryCreateTime") String expiryCreateTime);
+	
 }
