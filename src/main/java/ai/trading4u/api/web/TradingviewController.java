@@ -52,7 +52,7 @@ public class TradingviewController {
 
 	@PostMapping("/tva/webhook")
 	public Map<String, Object> orderWebhookByTva(@RequestBody Crypto25TvaOrderReq tva) {
-		String authKeyStr = authKeyService.getAuthKey(tva.getOrderExchange().name(), tva.getApiKey(), tva.getApiSecret());
+		String authKeyStr = authKeyService.getAuthKeyStr(tva.getOrderExchange().name(), tva.getApiKey(), tva.getApiSecret());
 		TradingviewOrderReq tvOrder = tva.toEntity();
 		tvOrder.setAuthKey(authKeyStr);
 		

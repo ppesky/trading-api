@@ -30,7 +30,30 @@ class AuthKeyServiceTest {
 		log.info(authKeyStr);
 
 		AuthKey authKeyObj = authKeyService.resolveKey(authKeyStr);
+
+		// cache test
+		authKeyObj = authKeyService.resolveKey(authKeyStr);
+		authKeyObj = authKeyService.resolveKey(authKeyStr);
 		
+		Assertions.assertEquals(apiKey, authKeyObj.getApiKey());
+		Assertions.assertEquals(apiSec, authKeyObj.getApiSecret());
+		
+//		fail("Not yet implemented");
+	}
+
+	@Test
+	void test2() {
+		String apiKey = "TQJRZTSQKYVVPSNQVW";
+		String apiSec = "WGNANGPEOGUOUYYXJTMQEVDXQGLUXEWKVXEP";
+		
+		String authKeyStr = authKeyService.getAuthKeyStr("BYBIT", apiKey, apiSec);
+
+		// cache test
+		authKeyStr = authKeyService.getAuthKeyStr("BYBIT", apiKey, apiSec);
+		authKeyStr = authKeyService.getAuthKeyStr("BYBIT", apiKey, apiSec);
+
+		AuthKey authKeyObj = authKeyService.resolveKey(authKeyStr);
+
 		Assertions.assertEquals(apiKey, authKeyObj.getApiKey());
 		Assertions.assertEquals(apiSec, authKeyObj.getApiSecret());
 		

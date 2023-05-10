@@ -19,21 +19,23 @@ public class AuthKeyService {
 	private String internalKey = "Tbe_rhJ#nw$9Aahj";
 	
 	public String generateKey(AuthKey authKey) {
-		log.info(authKey.getApiKey() + " generate.");
+		log.info(authKey.getExchangeName() + " - " + authKey.getApiKey() + " generate.");
 		if(authKey.getComputeString() == null) {
 			return null;
 		}
 		return encrypt(authKey.getComputeString());
 	}
 
-	@Cacheable(cacheNames = "temp", key="{#exchangeName, #apiKey, #apiSecret}")
-	public String getAuthKey(String exchangeName, String apiKey, String apiSecret) {
+	@Cacheable(cacheNames = "exchange_key", key="{#exchangeName, #apiKey}")
+	public String getAuthKeyStr(String exchangeName, String apiKey, String apiSecret) {
+		log.info("getAuthKeyStr = " + exchangeName +","+ apiKey);
 		AuthKey authKey = new AuthKey(exchangeName, apiKey, apiSecret);
 		return generateKey(authKey);
 	}
 
-	@Cacheable(cacheNames = "authkey")
+	@Cacheable(cacheNames = "auth_key")
 	public AuthKey resolveKey(String authKeyStr) {
+		log.info("resolveKey = " + authKeyStr);
 		String computeString = decrypt(authKeyStr);
 		return AuthKey.getAuthKey(authKeyStr, computeString);
 	}

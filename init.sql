@@ -1,5 +1,5 @@
 
-CREATE TABLE wut_dev.trade_data (
+CREATE TABLE trade_data (
 	trade_num BIGINT UNSIGNED auto_increment NOT NULL,
 	auth_key varchar(100) NOT NULL,
 	event_name varchar(30) NULL,
@@ -17,6 +17,16 @@ CREATE TABLE wut_dev.trade_data (
 	req_time varchar(50) NULL,
 	res_time varchar(50) NULL,
 	CONSTRAINT trade_data_PK PRIMARY KEY (trade_num)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE allowed_account (
+	allowed_num BIGINT UNSIGNED auto_increment NOT NULL,
+	allowed_type varchar(10) NOT NULL,
+	allowed_name varchar(100) NOT NULL,
+	CONSTRAINT allowed_account_PK PRIMARY KEY (allowed_num)
 )
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4

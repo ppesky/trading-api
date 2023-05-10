@@ -1,43 +1,61 @@
 package ai.trading4u.api.config;
 
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.support.SimpleCacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 @EnableCaching
 @Configuration
 public class CacheConfig {
+	
+	@Bean
+	CacheManager cacheManager() {
 
-//	@Bean
-//    Caffeine caffeineConfig() {
-//        return Caffeine
-//                .newBuilder()
-////                .maximumSize(10_000)
-//                .expireAfterWrite(60, TimeUnit.MINUTES);
-//    }
-//
-//    @Bean
-//    CacheManager cacheManager(Caffeine caffeine) {
-//        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-//        cacheManager.setCaffeine(caffeine);
-//        return cacheManager;
-//    }
-    
-//	@Bean
-//    public CacheManager cacheManager() {
-//        SimpleCacheManager cacheManager = new SimpleCacheManager();
-//
-//        List<CaffeineCache> caches = Arrays.stream(CacheType.values())
-//            .map(cache -> new CaffeineCache(
-//                cache.getName(),
-//                Caffeine.newBuilder()
-//                    .expireAfterWrite(cache.getExpireAfterWrite(), TimeUnit.SECONDS)
-//                    .maximumSize(cache.getMaximumSize())
-//                    .recordStats()
-//                    .build()
-//            ))
-//            .collect(Collectors.toList());
-//
-//        cacheManager.setCaches(caches);
-//        return cacheManager;
-//    }
+		CaffeineCache allowedCache = new CaffeineCache(
+				DomainCacheType.allowed_account.name(), 
+				Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build()
+		);
+
+		CaffeineCache authkeyCache = new CaffeineCache(
+				DomainCacheType.auth_key.name(), 
+				Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).build()
+		);
+
+		CaffeineCache exchangekeyCache = new CaffeineCache(
+				DomainCacheType.exchange_key.name(), 
+				Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).build()
+		);
+
+		CaffeineCache oneMinCache = new CaffeineCache(
+				DomainCacheType.one_min.name(), 
+				Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build()
+		);
+
+	    SimpleCacheManager manager = new SimpleCacheManager();
+	    manager.setCaches(Arrays.asList(
+	    		allowedCache, 
+	    		authkeyCache,
+	    		exchangekeyCache,
+	    		oneMinCache
+	    		)
+	    );
+	    
+	    return manager;
+	}
+
+//  @Autowired CacheManager cacheManager;
+//  public void removeAllCaches() {
+//      for (String cacheName : cacheManager.getCacheNames()) {
+//          cacheManager.getCache(cacheName).clear();
+//      }
+//  }
+	
 }
