@@ -38,11 +38,11 @@ public class TradeDataDto {
 
 		String retMsg;
 		
-		String createTime;
+		long createTime;
 		
-		String reqTime;
+		long reqTime;
 		
-		String resTime;
+		long resTime;
 	}
 
 }

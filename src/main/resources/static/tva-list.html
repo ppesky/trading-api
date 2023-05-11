@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TVA List</title>
+
+<link href="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.13.4/af-2.5.3/r-2.4.1/datatables.min.css" rel="stylesheet"/>
+<script src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.13.4/af-2.5.3/r-2.4.1/datatables.min.js"></script>
+
+<body>
+auth-key : <input type="text" id="auth_key" style="width:800px" value="" />
+<input type="button" id="btn_search" value="setting"/>
+<p/>
+<table id="trade-list" class="display">
+	<thead>
+    <tr>
+        <th>trade num</th>
+        <th>alert</th>
+        <th>alert time</th>
+        <th>symbol</th>
+        <th>mode</th>
+        <th>order id</th>
+        <th>action</th>
+        <th>qty</th>
+        <th>msg</th>
+        <th>request time</th>
+        <th>response time</th>
+    </tr>
+    </thead>
+</table>
+	
+	
+</body>
+
+</html>
+
+<script>
+	$("#btn_search").on("click", function () {
+		if($("#auth_key").val().trim().length == 0) {
+			alert("Pls, input auth-key.");
+			location.href = "/static/key-gen.html";
+			return;
+		}
+		$("#trade-list").DataTable({
+			destroy: true,
+		    ajax: {
+				url: "/tv4u/list/" + $("#auth_key").val(),
+				dataSrc: ""
+			},
+	        columnDefs: [
+	            {
+	                target: 9,
+	                render: DataTable.render.datetime("yyyy-mm-dd HH:MM:ss l"),
+	            },
+	            {
+	                target: 10,
+	                render: DataTable.render.datetime("yyyy-mm-dd HH:MM:ss l"),
+	            }
+	        ],
+			columns: [
+				{data:"trade_num"},
+				{data:"event_name"},
+				{data:"event_time"},
+				{data:"order_symbol"},
+				{data:"order_mode"},
+				{data:"order_name"},
+				{data:"order_action"},
+				{data:"order_size"},
+				{data:"ret_msg", defaultContent:"N/A"},
+				{data:"req_time"},
+				{data:"res_time"}
+			]
+		}).order.fixed( {
+	    	pre: [ 0, 'desc' ]
+		});
+		
+	})
+	
+	/*
+	setInterval( function () {
+	    table.ajax.reload();
+	}, 30000 );
+	*/
+	
+</script>

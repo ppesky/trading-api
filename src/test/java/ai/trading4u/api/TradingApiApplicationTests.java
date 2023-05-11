@@ -1,5 +1,7 @@
 package ai.trading4u.api;
 
+import java.time.ZonedDateTime;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +26,12 @@ class TradingApiApplicationTests {
 		
 		Assertions.assertTrue(n.length() == 20);
 		Assertions.assertTrue(h.length() == 20);
+	}
+	
+	@Test
+	void test1() {
+		long millis = ZonedDateTime.parse("2023-05-11T04:19:30.490933Z[UTC]").toInstant().toEpochMilli();
+		log.debug(millis + "");
 	}
 
 }

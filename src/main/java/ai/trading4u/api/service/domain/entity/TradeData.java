@@ -2,6 +2,7 @@ package ai.trading4u.api.service.domain.entity;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import org.springframework.util.StringUtils;
@@ -104,9 +105,9 @@ public class TradeData {
 		dto.setOrderAction(tradeData.getOrderAction());
 		dto.setOrderSize(tradeData.getOrderSize());
 		dto.setTpPrice(tradeData.getTpPrice());
-		dto.setCreateTime(tradeData.getCreateTime());
-		dto.setReqTime(tradeData.getReqTime());
-		dto.setResTime(tradeData.getResTime());
+		dto.setCreateTime(ZonedDateTime.parse(tradeData.getCreateTime()).toInstant().toEpochMilli());
+		dto.setReqTime(ZonedDateTime.parse(tradeData.getReqTime()).toInstant().toEpochMilli());
+		dto.setResTime(ZonedDateTime.parse(tradeData.getResTime()).toInstant().toEpochMilli());
 		if(StringUtils.hasText(tradeData.getResData())) {
 			try {
 				
