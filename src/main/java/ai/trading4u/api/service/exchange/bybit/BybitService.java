@@ -256,14 +256,14 @@ public class BybitService {
     				.bodyToMono(String.class)
     				.block();
         } catch (Exception e) {
-        	data1.setResponse("{\"retCode\": -1, \"retMsg\":\"" + e.getMessage() + "\"}");
+        	data1.setResponse("{\"retCode\": -1, \"retMsg\":\"" + StringUtils.truncate(e.getMessage(), 100) + "\"}");
 		} finally {
-			data1.setResponse(res);
+			data1.setResponse(StringUtils.truncate(res, 950));
         }
 	}
 
 	
-	
+	// 아래 코드는 bybit 에서 제공하는 코드임.
 	
     private String genPostSign(String apiKey, String apiSecret, String timestamp, Map<String, Object> params) {
     	try {
@@ -275,7 +275,7 @@ public class BybitService {
             String sb = timestamp + apiKey + RECV_WINDOW + paramJson;
             return bytesToHex(sha256_HMAC.doFinal(sb.getBytes()));
     	} catch(Exception e) {
-    		throw new RuntimeException("");
+    		throw new RuntimeException("post signature generate error.");
     	}
     }
 
@@ -290,7 +290,7 @@ public class BybitService {
             sha256_HMAC.init(secret_key);
             return bytesToHex(sha256_HMAC.doFinal(queryStr.getBytes()));
     	} catch(Exception e) {
-    		throw new RuntimeException("");
+    		throw new RuntimeException("get signature generate error.");
     	}
     }
 

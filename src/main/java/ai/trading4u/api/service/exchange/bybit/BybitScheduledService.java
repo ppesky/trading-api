@@ -33,7 +33,7 @@ public class BybitScheduledService {
 	public void scheduledCallBybitApi() {
 		while(true) {
 			List<TradeDataDto.AuthKeyAndSymbol> targetSymbolList = tradeRepository.findDistinctByReqExchangeReqTimeIsNull(ExchangeName.BYBIT.name());
-			log.info("scheduled Call BybitApi. count = " + targetSymbolList.size());
+			
 			if(targetSymbolList == null || targetSymbolList.size() == 0) {
 				break;
 			}

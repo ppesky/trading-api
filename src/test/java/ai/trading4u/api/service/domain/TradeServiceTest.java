@@ -100,8 +100,8 @@ class TradeServiceTest {
 			""";
 
 //	,"tp_price" : ""
-	
-	@Disabled
+
+	@Rollback
 	@Test
 	void test1() throws JsonMappingException, JsonProcessingException {
 		
