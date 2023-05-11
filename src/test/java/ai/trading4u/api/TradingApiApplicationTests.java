@@ -13,14 +13,17 @@ class TradingApiApplicationTests {
 
 	@Test
 	void contextLoads() {
-		String n = StringUtils.truncate("0123456789", 8);
-		String h = StringUtils.truncate("영일이삼사오육칠팔구", 8);
+		String n = StringUtils.truncate("0123456789", 5);
+		String h = StringUtils.truncate("영일이삼사오육칠팔구", 5);
+
+		log.debug(n + " => " + n.length());
+		log.debug(h + " => " + h.length());
 		
-		log.debug(n + " => " + n.getBytes().length);
-		log.debug(h + " => " + h.getBytes().length);
+		log.debug(n + " bytes => " + n.getBytes().length);
+		log.debug(h + " bytes => " + h.getBytes().length);
 		
-		Assertions.assertTrue(n.length() == 5);
-		Assertions.assertTrue(h.length() == 5);
+		Assertions.assertTrue(n.length() == 20);
+		Assertions.assertTrue(h.length() == 20);
 	}
 
 }
