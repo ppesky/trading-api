@@ -5,9 +5,9 @@ export pid=`ps -ef | grep trading-api1.jar | grep -v "grep"| wc -l`
 
 if [ "$pid" == 1 ]; then
 	echo -e "Stopping...\n"
-	curl -X POST http://127.0.0.1:9080/actuator/shutdown
+	curl -X POST http://127.0.0.1:9081/actuator/shutdown
 	echo -e "\n\n"
-	sleep 3s
+	sleep 5s
 fi
 
 export pid1=`ps -ef | grep trading-api1.jar | grep -v "grep"| wc -l`

@@ -38,13 +38,13 @@ auth-key : <input type="text" id="auth_key" style="width:800px" value="" />
 	$("#btn_search").on("click", function () {
 		if($("#auth_key").val().trim().length == 0) {
 			alert("Pls, input auth-key.");
-			location.href = "/static/key-gen.html";
+			location.href = "key-gen.html";
 			return;
 		}
 		$("#trade-list").DataTable({
 			destroy: true,
 		    ajax: {
-				url: "/tv4u/list/" + $("#auth_key").val(),
+				url: "/api/tv4u/list/" + $("#auth_key").val(),
 				dataSrc: ""
 			},
 	        columnDefs: [

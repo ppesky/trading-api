@@ -30,7 +30,7 @@ auth-key : <input type="text" id="auth_key" readonly="readonly" style="width:800
 
 	$("#btn_generate").on("click", function () {
 		$.ajax({
-			url : "/tv4u/authkey/generate",
+			url : "/api/tv4u/authkey/generate",
 		    data: JSON.stringify({ "exchange_name": "BYBIT", "api_key":$("#api_key").val(), "api_secret":$("#api_sec").val() }),
 		    method: "POST",
 		    headers: {'Content-Type': 'application/json'},
