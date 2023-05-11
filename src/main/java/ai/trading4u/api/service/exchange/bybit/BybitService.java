@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ai.trading4u.api.service.domain.ExchangeName;
 import ai.trading4u.api.service.domain.TradeRepository;
 import ai.trading4u.api.service.domain.entity.TradeData;
 import ai.trading4u.api.web.entity.AuthKey;
@@ -146,7 +147,7 @@ public class BybitService {
 	@Transactional
 	public CompletableFuture<String> requestBybit(AuthKey authKeyObj, String orderSymbol) {
 		List<TradeData> dataList = tradeRepository.findByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(
-				TradingviewOrderReq.OrderExchange.BYBIT.name(), authKeyObj.getAuthKeyStr(), orderSymbol);
+				ExchangeName.BYBIT.name(), authKeyObj.getAuthKeyStr(), orderSymbol);
 		
 //		https://bybit-exchange.github.io/docs/v5/rate-limit#api-rate-limit-table
 		String nums = "";

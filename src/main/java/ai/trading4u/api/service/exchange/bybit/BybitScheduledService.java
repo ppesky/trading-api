@@ -6,16 +6,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import ai.trading4u.api.service.domain.AuthKeyService;
+import ai.trading4u.api.service.domain.ExchangeName;
 import ai.trading4u.api.service.domain.TradeRepository;
 import ai.trading4u.api.service.domain.entity.TradeDataDto;
 import ai.trading4u.api.web.entity.AuthKey;
-import ai.trading4u.api.web.entity.TradingviewOrderReq;
 import lombok.extern.slf4j.Slf4j;
 
+@Profile({"local", "prod1"})
 @Slf4j
 @Service
 public class BybitScheduledService {
@@ -30,7 +32,8 @@ public class BybitScheduledService {
 	@Scheduled(fixedDelay = 1000, initialDelay = 3000)
 	public void scheduledCallBybitApi() {
 		while(true) {
-			List<TradeDataDto.AuthKeyAndSymbol> targetSymbolList = tradeRepository.findDistinctByReqExchangeReqTimeIsNull(TradingviewOrderReq.OrderExchange.BYBIT.name());
+			List<TradeDataDto.AuthKeyAndSymbol> targetSymbolList = tradeRepository.findDistinctByReqExchangeReqTimeIsNull(ExchangeName.BYBIT.name());
+			log.info("scheduled Call BybitApi. count = " + targetSymbolList.size());
 			if(targetSymbolList == null || targetSymbolList.size() == 0) {
 				break;
 			}

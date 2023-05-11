@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ai.trading4u.api.web.entity.TradingviewOrderReq.OrderAction;
 import ai.trading4u.api.web.entity.TradingviewOrderReq.OrderCategory;
-import ai.trading4u.api.web.entity.TradingviewOrderReq.OrderExchange;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -144,7 +143,7 @@ public class Crypto25TvaOrderReq {
 	String orderId;
 
 	@JsonProperty(value = "exchange")
-	OrderExchange orderExchange;
+	String orderExchange;
 
 	@JsonProperty(value = "type")
 	OrderCategory orderCategory;
@@ -172,7 +171,7 @@ public class Crypto25TvaOrderReq {
 		tvOrder.setAlertName(alertName);
 		tvOrder.setAlertTime(alertTime);
 		tvOrder.setOrderId(orderId);
-		tvOrder.setOrderExchange(orderExchange);
+//		tvOrder.setOrderExchange(orderExchange);
 		tvOrder.setOrderCategory(orderCategory);
 		tvOrder.setOrderMode(orderMode);
 		tvOrder.setOrderSymbol(orderSymbol);

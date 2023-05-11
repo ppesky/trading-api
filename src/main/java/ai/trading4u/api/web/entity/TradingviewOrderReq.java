@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 public class TradingviewOrderReq {
 	
-	public enum OrderExchange {BYBIT}
-	
 	public enum OrderCategory {future}	// {spot, future}
 	
 	public enum OrderAction {buy, sell}
@@ -26,9 +24,6 @@ public class TradingviewOrderReq {
 	
 	@JsonProperty(value = "order_id")
 	String orderId;
-
-	@JsonProperty(value = "order_exchange")
-	OrderExchange orderExchange;
 
 	@JsonProperty(value = "order_category")
 	OrderCategory orderCategory;

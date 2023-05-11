@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.trading4u.api.service.domain.AllowedAccountService;
 import ai.trading4u.api.service.domain.AuthKeyService;
+import ai.trading4u.api.service.domain.ExchangeName;
 import ai.trading4u.api.service.domain.TradeService;
 import ai.trading4u.api.service.domain.entity.TradeData;
 import ai.trading4u.api.service.domain.entity.TradeDataDto;
@@ -29,15 +30,21 @@ public class TradingviewController {
 	@Autowired AuthKeyService authKeyService;
 	@Autowired TradeService tradeService;
 
-	@PostMapping("/tv4u/webhook")
-	public Map<String, Object> orderWebhook(@RequestBody TradingviewOrderReq tvOrder) {
+	@PostMapping("/tv4u/webhook/bybit")
+	public Map<String, Object> orderWebhookForBybit(@RequestBody TradingviewOrderReq tvOrder) {
 		boolean b = allowedAccountService.isAllowedAccount(AllowedType.AUTH_KEY.name(), tvOrder.getAuthKey());
 		if(!b) {
 			return Map.of("result", "Your key cannot be used.");
 		}
 		
-		tradeService.saveRequest(tvOrder);
+		tradeService.saveRequest(ExchangeName.BYBIT, tvOrder);
 		return Map.of("result", "success");
+	}
+
+	@PostMapping("/tv4u/webhook/bitget")
+	public Map<String, Object> orderWebhookForBitget(@RequestBody TradingviewOrderReq tvOrder) {
+		
+		return Map.of("result", "Coming soon.");
 	}
 
 	@PostMapping("/tv4u/authkey/generate")
@@ -68,18 +75,18 @@ public class TradingviewController {
 	
 	/////// 여기 아래는 크립토25 지원 코드. ///////
 
-	@PostMapping("/tva/webhook")
+	@PostMapping("/tva/webhook/bybit")
 	public Map<String, Object> orderWebhookByTva(@RequestBody Crypto25TvaOrderReq tva) {
 		boolean b = allowedAccountService.isAllowedAccount(AllowedType.EXCHANGE_KEY.name(), tva.getApiKey());
 		if(!b) {
 			return Map.of("result", "Your key cannot be used.");
 		}
 		
-		String authKeyStr = authKeyService.getAuthKeyStr(tva.getOrderExchange().name(), tva.getApiKey(), tva.getApiSecret());
+		String authKeyStr = authKeyService.getAuthKeyStr(ExchangeName.BYBIT.name(), tva.getApiKey(), tva.getApiSecret());
 		TradingviewOrderReq tvOrder = tva.toEntity();
 		tvOrder.setAuthKey(authKeyStr);
 		
-		tradeService.saveRequest(tvOrder);
+		tradeService.saveRequest(ExchangeName.BYBIT, tvOrder);
 		return Map.of("result", "success");
 	}
 	

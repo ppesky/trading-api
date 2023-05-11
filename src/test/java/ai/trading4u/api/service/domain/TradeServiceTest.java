@@ -111,10 +111,10 @@ class TradeServiceTest {
 		TradingviewOrderReq tvOrderShortClose = objectMapper.readValue(onewayShortClose, TradingviewOrderReq.class);
 
 		for(int i=0; i<1; i++) {
-			tradeService.saveRequest(tvOrderLongBuy);
-			tradeService.saveRequest(tvOrderLongClose);
-			tradeService.saveRequest(tvOrderShortSell);
-			tradeService.saveRequest(tvOrderShortClose);
+			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderLongBuy);
+			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderLongClose);
+			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderShortSell);
+			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderShortClose);
 		}
 	}
 	
@@ -193,10 +193,10 @@ class TradeServiceTest {
 		TradingviewOrderReq tvOrderShortClose = objectMapper.readValue(hedgeShortClose, TradingviewOrderReq.class);
 
 		for(int i=0; i<1; i++) {
-			tradeService.saveRequest(tvOrderLongBuy);
-			tradeService.saveRequest(tvOrderShortSell);
-			tradeService.saveRequest(tvOrderLongClose);
-			tradeService.saveRequest(tvOrderShortClose);
+			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderLongBuy);
+			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderShortSell);
+			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderLongClose);
+			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderShortClose);
 
 //			tvOrderLongBuy.setTpPrice("");
 //			exchangeService.saveRequest(tvOrderLongBuy);

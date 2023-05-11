@@ -29,7 +29,7 @@ public class TradeService {
 		return tradeRepository.findTop999ByAuthKeyOrderByTradeNumDesc(authKey);
 	}
 
-	public void saveRequest(TradingviewOrderReq tvOrder) {
+	public void saveRequest(ExchangeName exchangeName, TradingviewOrderReq tvOrder) {
 		
 		String paramJson;
 		try {
@@ -42,7 +42,7 @@ public class TradeService {
 				tvOrder.getAuthKey(), 
 				tvOrder.getAlertName(), 
 				tvOrder.getAlertTime(), 
-				tvOrder.getOrderExchange().name(), 
+				exchangeName.name(), 
 				tvOrder.getOrderSymbol(), 
 				tvOrder.getOrderMode(),
 				tvOrder.getOrderId(),
