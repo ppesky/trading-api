@@ -10,17 +10,49 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ai.trading4u.api.service.domain.entity.TradeData;
+import ai.trading4u.api.web.entity.TradingviewOrderReq;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class TradeService {
-	
+
+	@Autowired ObjectMapper objectMapper;
+
 	@Autowired TradeRepository tradeRepository;
 	
 	public List<TradeData> findTop999ByAuthKeyOrderByTradeNumDesc(String authKey) {
 		return tradeRepository.findTop999ByAuthKeyOrderByTradeNumDesc(authKey);
+	}
+
+	public void saveRequest(TradingviewOrderReq tvOrder) {
+		
+		String paramJson;
+		try {
+			paramJson = objectMapper.writeValueAsString(tvOrder);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Json Parsing Error.");
+		}
+		
+		TradeData data = new TradeData(
+				tvOrder.getAuthKey(), 
+				tvOrder.getAlertName(), 
+				tvOrder.getAlertTime(), 
+				tvOrder.getOrderExchange().name(), 
+				tvOrder.getOrderSymbol(), 
+				tvOrder.getOrderMode(),
+				tvOrder.getOrderId(),
+				tvOrder.getOrderAction().name(),
+				tvOrder.getOrderSize(),
+				tvOrder.getTpPrice(),
+				paramJson);
+		
+		tradeRepository.save(data);
+		
 	}
 
 	@Transactional

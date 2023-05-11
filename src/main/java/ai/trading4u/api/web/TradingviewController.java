@@ -16,7 +16,6 @@ import ai.trading4u.api.service.domain.AuthKeyService;
 import ai.trading4u.api.service.domain.TradeService;
 import ai.trading4u.api.service.domain.entity.TradeData;
 import ai.trading4u.api.service.domain.entity.TradeDataDto;
-import ai.trading4u.api.service.exchange.ExchangeService;
 import ai.trading4u.api.web.entity.AuthKey;
 import ai.trading4u.api.web.entity.Crypto25TvaOrderReq;
 import ai.trading4u.api.web.entity.TradingviewOrderReq;
@@ -28,7 +27,6 @@ public class TradingviewController {
 	
 	@Autowired AllowedAccountService allowedAccountService;
 	@Autowired AuthKeyService authKeyService;
-	@Autowired ExchangeService exchangeService;
 	@Autowired TradeService tradeService;
 
 	@PostMapping("/tv4u/webhook")
@@ -38,7 +36,7 @@ public class TradingviewController {
 			return Map.of("result", "Your key cannot be used.");
 		}
 		
-		exchangeService.saveRequest(tvOrder);
+		tradeService.saveRequest(tvOrder);
 		return Map.of("result", "success");
 	}
 
@@ -81,7 +79,7 @@ public class TradingviewController {
 		TradingviewOrderReq tvOrder = tva.toEntity();
 		tvOrder.setAuthKey(authKeyStr);
 		
-		exchangeService.saveRequest(tvOrder);
+		tradeService.saveRequest(tvOrder);
 		return Map.of("result", "success");
 	}
 	

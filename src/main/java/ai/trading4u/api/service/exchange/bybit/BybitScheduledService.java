@@ -1,4 +1,4 @@
-package ai.trading4u.api.service.exchange;
+package ai.trading4u.api.service.exchange.bybit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,55 +9,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ai.trading4u.api.service.domain.AuthKeyService;
 import ai.trading4u.api.service.domain.TradeRepository;
-import ai.trading4u.api.service.domain.entity.TradeData;
 import ai.trading4u.api.service.domain.entity.TradeDataDto;
-import ai.trading4u.api.service.exchange.bybit.BybitService;
 import ai.trading4u.api.web.entity.AuthKey;
 import ai.trading4u.api.web.entity.TradingviewOrderReq;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class ExchangeService {
+public class BybitScheduledService {
 	
-	@Autowired ObjectMapper objectMapper;
-
 	@Autowired TradeRepository tradeRepository;
 	
 	@Autowired AuthKeyService authKeyService;
 	
 	@Autowired BybitService bybitService;
-	
-	public void saveRequest(TradingviewOrderReq tvOrder) {
-		
-		String paramJson;
-		try {
-			paramJson = objectMapper.writeValueAsString(tvOrder);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Json Parsing Error.");
-		}
-		
-		TradeData data = new TradeData(
-				tvOrder.getAuthKey(), 
-				tvOrder.getAlertName(), 
-				tvOrder.getAlertTime(), 
-				tvOrder.getOrderExchange().name(), 
-				tvOrder.getOrderSymbol(), 
-				tvOrder.getOrderMode(),
-				tvOrder.getOrderId(),
-				tvOrder.getOrderAction().name(),
-				tvOrder.getOrderSize(),
-				tvOrder.getTpPrice(),
-				paramJson);
-		
-		tradeRepository.save(data);
-		
-	}
 	
 	// fixedDelay : milliseconds 단위로, 이전 Task의 종료 시점으로부터 정의된 시간만큼 지난 후 Task를 실행한다.
 	@Scheduled(fixedDelay = 1000, initialDelay = 3000)
