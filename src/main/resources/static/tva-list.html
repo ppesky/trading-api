@@ -16,13 +16,13 @@ auth-key : <input type="text" id="auth_key" style="width:800px" value="" />
     <tr>
         <th>trade num</th>
         <th>alert</th>
-        <th>alert time</th>
         <th>symbol</th>
         <th>mode</th>
         <th>order id</th>
         <th>action</th>
         <th>qty</th>
         <th>msg</th>
+        <th>create time</th>
         <th>request time</th>
         <th>response time</th>
     </tr>
@@ -49,6 +49,10 @@ auth-key : <input type="text" id="auth_key" style="width:800px" value="" />
 			},
 	        columnDefs: [
 	            {
+	                target: 8,
+	                render: DataTable.render.datetime("yyyy-mm-dd HH:MM:ss l"),
+	            },
+	            {
 	                target: 9,
 	                render: DataTable.render.datetime("yyyy-mm-dd HH:MM:ss l"),
 	            },
@@ -60,13 +64,13 @@ auth-key : <input type="text" id="auth_key" style="width:800px" value="" />
 			columns: [
 				{data:"trade_num"},
 				{data:"event_name"},
-				{data:"event_time"},
 				{data:"order_symbol"},
 				{data:"order_mode"},
 				{data:"order_name"},
 				{data:"order_action"},
 				{data:"order_size"},
 				{data:"ret_msg", defaultContent:"N/A"},
+				{data:"create_time"},
 				{data:"req_time"},
 				{data:"res_time"}
 			]
