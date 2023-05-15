@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>tranding4u json generate</title>
+
+<link href="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.13.4/af-2.5.3/r-2.4.1/datatables.min.css" rel="stylesheet"/>
+<script src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.13.4/af-2.5.3/r-2.4.1/datatables.min.js"></script>
+
+<body>
+
+<table border="0">
+	<tr>
+		<td>Auth Key : <input type="text" name="auth_key" id="auth_key" value="" onkeypress="generate()" /></td colspan="2">
+		<td rowspan="2"><textarea id="json_view" name="json_view" style="width: 500px; height: 250px;"></textarea></td rowspan="2">
+	</tr>
+	<tr>
+		<td> Order Mode : 
+			<select name="order_mode" id="order_mode" onchange="generate()">
+				<option value="">---</option>
+				<option value="oneway">oneway</option>
+				<option value="hedge">hedge</option>
+			</select>
+		</td>
+	</tr>
+</table>
+
+</body>
+
+</html>
+
+<script>
+function generate() {
+	var data = new Object() ;
+	data.auth_key   = $("#auth_key").val();
+	data.alert_name = "Pls, Modify here!";
+	data.alert_time = "{{time}}";
+	data.order_id   = "{{strategy.order.id}}";
+	data.order_category  ="future";
+	data.order_mode = $("#order_mode").val();
+	data.order_symbol = "{{ticker}}";
+	data.order_action = "{{strategy.order.action}}";
+	data.order_size = "{{strategy.order.contracts}}";
+	data.tp_price = "{{strategy.order.alert_message}}";
+	
+	var jsonData = JSON.stringify(data, null, 4) ;
+	
+	$("#json_view").val(jsonData);
+}
+</script>
