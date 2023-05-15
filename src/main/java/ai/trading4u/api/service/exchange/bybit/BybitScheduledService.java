@@ -29,7 +29,7 @@ public class BybitScheduledService {
 	@Autowired BybitService bybitService;
 	
 	// fixedDelay : milliseconds 단위로, 이전 Task의 종료 시점으로부터 정의된 시간만큼 지난 후 Task를 실행한다.
-	@Scheduled(fixedDelay = 1000, initialDelay = 3000)
+	@Scheduled(fixedDelay = 700, initialDelay = 3000)
 	public void scheduledCallBybitApi() {
 		while(true) {
 			List<TradeDataDto.AuthKeyAndSymbol> targetSymbolList = tradeRepository.findDistinctByReqExchangeReqTimeIsNull(ExchangeName.BYBIT.name());
@@ -39,6 +39,12 @@ public class BybitScheduledService {
 			}
 			log.info("scheduled Call BybitApi. count = " + targetSymbolList.size());
 			callBybitApi(targetSymbolList);
+			try {
+				// 주문 후 0.5초 대기~ (바이빗은 초당 10개의 주문을 허용함.) : 계정별 초당 5개 종목 2개 주문까지 처리?? 
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				log.error(e.getMessage());
+			}
 		}
 	}
 	

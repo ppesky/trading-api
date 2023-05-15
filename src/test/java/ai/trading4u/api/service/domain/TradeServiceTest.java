@@ -49,7 +49,7 @@ class TradeServiceTest {
 				"order_symbol" : "IDUSDT.P",
 				"order_action" : "buy",
 				"order_size" : "1"
-				,"tp_price" : "0.5"
+				,"tp_price" : "0.6"
 			}
 			""";
 
@@ -101,7 +101,7 @@ class TradeServiceTest {
 
 //	,"tp_price" : ""
 
-	@Rollback
+//	@Rollback(false)
 	@Test
 	void test1() throws JsonMappingException, JsonProcessingException {
 		
@@ -110,7 +110,7 @@ class TradeServiceTest {
 		TradingviewOrderReq tvOrderShortSell = objectMapper.readValue(onewayShortSell, TradingviewOrderReq.class);
 		TradingviewOrderReq tvOrderShortClose = objectMapper.readValue(onewayShortClose, TradingviewOrderReq.class);
 
-		for(int i=0; i<1; i++) {
+		for(int i=0; i<10; i++) {
 			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderLongBuy);
 			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderLongClose);
 			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderShortSell);
@@ -183,7 +183,8 @@ class TradeServiceTest {
 			""";
 
 
-	@Disabled
+//	@Disabled
+//	@Rollback(false)
 	@Test
 	void test2() throws JsonMappingException, JsonProcessingException {
 		
@@ -192,7 +193,7 @@ class TradeServiceTest {
 		TradingviewOrderReq tvOrderShortSell = objectMapper.readValue(hedgeShortSell, TradingviewOrderReq.class);
 		TradingviewOrderReq tvOrderShortClose = objectMapper.readValue(hedgeShortClose, TradingviewOrderReq.class);
 
-		for(int i=0; i<1; i++) {
+		for(int i=0; i<10; i++) {
 			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderLongBuy);
 			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderShortSell);
 			tradeService.saveRequest(ExchangeName.BYBIT, tvOrderLongClose);

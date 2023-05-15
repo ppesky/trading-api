@@ -146,7 +146,8 @@ public class BybitService {
 	@Async("bybitExecutor")
 	@Transactional
 	public CompletableFuture<String> requestBybit(AuthKey authKeyObj, String orderSymbol) {
-		List<TradeData> dataList = tradeRepository.findByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(
+		// 2건만 처리. 다른 쓰레드가 기다리면 안되므로~
+		List<TradeData> dataList = tradeRepository.findTop2ByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(
 				ExchangeName.BYBIT.name(), authKeyObj.getAuthKeyStr(), orderSymbol);
 		
 //		https://bybit-exchange.github.io/docs/v5/rate-limit#api-rate-limit-table
@@ -154,13 +155,6 @@ public class BybitService {
 		for(TradeData data : dataList) {
 			nums += data.getTradeNum() + " ";
 			placeOrder(authKeyObj, data);
-			
-			try {
-				// 같은 종목의 주문은 0.5초 대기~
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				log.error(e.getMessage());
-			}
 		}
 		
 		return CompletableFuture.completedFuture(nums);

@@ -25,7 +25,7 @@ public interface TradeRepository extends JpaRepository<TradeData, Long> {
 	)
 	List<TradeDataDto.AuthKeyAndSymbol> findDistinctByReqExchangeReqTimeIsNull(@Param("reqExchange") String reqExchange);
 
-	List<TradeData> findByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(String reqExchange, String authKey, String orderSymbol);
+	List<TradeData> findTop2ByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(String reqExchange, String authKey, String orderSymbol);
 
 	List<TradeData> findTop999ByAuthKeyOrderByTradeNumDesc(String authKey); // limit 999, 역순
 
