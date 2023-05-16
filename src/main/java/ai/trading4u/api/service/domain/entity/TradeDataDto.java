@@ -32,7 +32,7 @@ public class TradeDataDto {
 		
 		String orderSize;
 		
-		String tpPrice;
+		String takePrice;
 		
 		int retCode;
 

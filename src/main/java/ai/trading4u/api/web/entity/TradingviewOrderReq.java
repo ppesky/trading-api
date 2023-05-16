@@ -40,7 +40,7 @@ public class TradingviewOrderReq {
 	@JsonProperty(value = "order_size")
 	String orderSize;
 
-	@JsonProperty(value = "tp_price")
-	String tpPrice;
+	@JsonProperty(value = "take_price")
+	String takePrice;
 	
 }

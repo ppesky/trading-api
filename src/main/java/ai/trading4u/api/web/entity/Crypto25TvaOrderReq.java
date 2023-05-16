@@ -160,8 +160,8 @@ public class Crypto25TvaOrderReq {
 	@JsonProperty(value = "order_size")
 	String orderSize;
 
-	@JsonProperty(value = "tp_price")
-	String tpPrice;
+	@JsonProperty(value = "take_price")
+	String takePrice;
 	
 	@JsonProperty(value = "apikey")
 	String apiKey;
@@ -180,7 +180,7 @@ public class Crypto25TvaOrderReq {
 		tvOrder.setOrderSymbol(orderSymbol);
 		tvOrder.setOrderAction(orderAction);
 		tvOrder.setOrderSize(orderSize);
-		tvOrder.setTpPrice(tpPrice);
+		tvOrder.setTakePrice(takePrice);
 		
 		return tvOrder;
 	}

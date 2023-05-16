@@ -41,7 +41,7 @@ function generate() {
 	data.order_symbol = "{{ticker}}";
 	data.order_action = "{{strategy.order.action}}";
 	data.order_size = "{{strategy.order.contracts}}";
-	data.tp_price = "{{strategy.order.alert_message}}";
+	data.take_price = "{{strategy.order.alert_message}}";
 	
 	var jsonData = JSON.stringify(data, null, 4) ;
 	

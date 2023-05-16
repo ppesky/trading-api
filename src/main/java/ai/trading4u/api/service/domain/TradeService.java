@@ -48,7 +48,7 @@ public class TradeService {
 				tvOrder.getOrderId(),
 				tvOrder.getOrderAction().name(),
 				tvOrder.getOrderSize(),
-				tvOrder.getTpPrice(),
+				tvOrder.getTakePrice(),
 				paramJson);
 		
 		tradeRepository.save(data);

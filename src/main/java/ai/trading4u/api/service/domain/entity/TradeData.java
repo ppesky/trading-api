@@ -27,7 +27,7 @@ public class TradeData {
 	
 	public TradeData(String authKey, String eventName, String eventTime, 
 			String reqExchange, 
-			String orderSymbol, String orderMode, String orderName, String orderAction, String orderSize, String tpPrice,
+			String orderSymbol, String orderMode, String orderName, String orderAction, String orderSize, String takePrice,
 			String reqData) {
 		this.authKey = authKey;
 		this.eventName = eventName;
@@ -38,7 +38,7 @@ public class TradeData {
 		this.orderName = orderName;
 		this.orderAction = orderAction;
 		this.orderSize = orderSize;
-		this.tpPrice = tpPrice;
+		this.takePrice = takePrice;
 		this.reqData = reqData;
 		this.createTime = Instant.now().atZone(ZoneId.of("UTC")).toString();
 	}
@@ -65,7 +65,7 @@ public class TradeData {
 	
 	String orderSize;
 	
-	String tpPrice;
+	String takePrice;
 	
 	String reqData;
 	
@@ -104,7 +104,7 @@ public class TradeData {
 		dto.setOrderName(tradeData.getOrderName());
 		dto.setOrderAction(tradeData.getOrderAction());
 		dto.setOrderSize(tradeData.getOrderSize());
-		dto.setTpPrice(tradeData.getTpPrice());
+		dto.setTakePrice(tradeData.getTakePrice());
 		dto.setCreateTime(ZonedDateTime.parse(tradeData.getCreateTime()).toInstant().toEpochMilli());
 		dto.setReqTime(ZonedDateTime.parse(tradeData.getReqTime()).toInstant().toEpochMilli());
 		dto.setResTime(ZonedDateTime.parse(tradeData.getResTime()).toInstant().toEpochMilli());

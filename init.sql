@@ -10,7 +10,7 @@ CREATE TABLE trade_data (
 	order_name varchar(20) NOT NULL,
 	order_action varchar(10) NOT NULL,
 	order_size varchar(100) NOT NULL,
-	tp_price varchar(20) NULL,
+	take_price varchar(20) NULL,
 	req_data varchar(1000) NULL,
 	res_data varchar(1000) NULL,
 	create_time varchar(50) NULL,
