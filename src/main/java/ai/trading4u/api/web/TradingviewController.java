@@ -20,7 +20,9 @@ import ai.trading4u.api.service.domain.entity.TradeDataDto;
 import ai.trading4u.api.web.entity.AuthKey;
 import ai.trading4u.api.web.entity.Crypto25TvaOrderReq;
 import ai.trading4u.api.web.entity.TradingviewOrderReq;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 public class TradingviewController {
 	
@@ -34,8 +36,10 @@ public class TradingviewController {
 	public Map<String, Object> orderWebhookForBybit(@RequestBody TradingviewOrderReq tvOrder) {
 		boolean b = allowedAccountService.isAllowedAccount(AllowedType.AUTH_KEY.name(), tvOrder.getAuthKey());
 		if(!b) {
+			log.warn("[TV4U] Your key cannot be used. (" + tvOrder.getAuthKey() + ")");
 			return Map.of("result", "Your key cannot be used.");
 		}
+		log.info("[TV4U] "+ tvOrder.getAuthKey());
 		
 		tradeService.saveRequest(ExchangeName.BYBIT, tvOrder);
 		return Map.of("result", "success");
@@ -79,9 +83,10 @@ public class TradingviewController {
 	public Map<String, Object> orderWebhookByTva(@RequestBody Crypto25TvaOrderReq tva) {
 		boolean b = allowedAccountService.isAllowedAccount(AllowedType.EXCHANGE_KEY.name(), tva.getApiKey());
 		if(!b) {
+			log.warn("[tva] Your key cannot be used. (" + tva.getApiKey() + ")");
 			return Map.of("result", "Your key cannot be used.");
 		}
-		
+		log.info("[tva] "+ tva.getApiKey());
 		String authKeyStr = authKeyService.getAuthKeyStr(ExchangeName.BYBIT.name(), tva.getApiKey(), tva.getApiSecret());
 		TradingviewOrderReq tvOrder = tva.toEntity();
 		tvOrder.setAuthKey(authKeyStr);
