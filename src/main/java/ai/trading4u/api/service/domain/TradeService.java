@@ -28,8 +28,12 @@ public class TradeService {
 
 	@Autowired AuthKeyService authKeyService;
 	
-	public List<TradeData> findTop999ByAuthKeyOrderByTradeNumDesc(String authKey) {
-		return tradeRepository.findTop999ByAuthKeyOrderByTradeNumDesc(authKey);
+//	public List<TradeData> findTop999ByAuthKeyOrderByTradeNumDesc(String authKey) {
+//		return tradeRepository.findTop999ByAuthKeyOrderByTradeNumDesc(authKey);
+//	}
+
+	public List<TradeData> findTop999ByApiKeyOrderByTradeNumDesc(String apiKey) {
+		return tradeRepository.findTop999ByApiKeyOrderByTradeNumDesc(apiKey);
 	}
 
 	public void saveRequest(ExchangeName exchangeName, TradingviewOrderReq tvOrder) {

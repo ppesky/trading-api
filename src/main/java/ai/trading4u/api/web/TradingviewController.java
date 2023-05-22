@@ -57,13 +57,13 @@ public class TradingviewController {
 		return new AuthKey(authKey.getExchangeName(), authKey.getApiKey(), authKey.getApiSecret(), authKeyStr);
 	}
 	
-	@GetMapping("/tv4u/list/{authKey}")
-	public List<TradeDataDto.TradeDataResDto> getTradeData(@PathVariable("authKey") String authKeyStr) {
-		return tradeService.findTop999ByAuthKeyOrderByTradeNumDesc(authKeyStr)
-				.stream()
-				.map(TradeData::fromEntity)
-				.collect(Collectors.toList());
-	}
+//	@GetMapping("/tv4u/list/{authKey}")
+//	public List<TradeDataDto.TradeDataResDto> getTradeData(@PathVariable("authKey") String authKeyStr) {
+//		return tradeService.findTop999ByAuthKeyOrderByTradeNumDesc(authKeyStr)
+//				.stream()
+//				.map(TradeData::fromEntity)
+//				.collect(Collectors.toList());
+//	}
 
 	@GetMapping("/check/{type}/{key}")
 	public Map<String, Object> checkKey(
@@ -94,5 +94,13 @@ public class TradingviewController {
 		tradeService.saveRequestForCrytor25(ExchangeName.BYBIT, tva.getApiKey(), tvOrder);
 		return Map.of("result", "success");
 	}
-	
+
+	@GetMapping("/tva/list/{apiKey}")
+	public List<TradeDataDto.TradeDataResDto> getTradeData(@PathVariable("apiKey") String apiKey) {
+		return tradeService.findTop999ByApiKeyOrderByTradeNumDesc(apiKey)
+				.stream()
+				.map(TradeData::fromEntity)
+				.collect(Collectors.toList());
+	}
+
 }

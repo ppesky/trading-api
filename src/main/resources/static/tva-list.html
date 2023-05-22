@@ -8,8 +8,8 @@
 <script src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.13.4/af-2.5.3/r-2.4.1/datatables.min.js"></script>
 
 <body>
-auth-key : <input type="text" id="auth_key" style="width:800px" value="" />
-<input type="button" id="btn_search" value="setting"/>
+api-key : <input type="text" id="api_key" style="width:300px" value="" />
+<input type="button" id="btn_search" value="Search"/>
 <p/>
 <table id="trade-list" class="display">
 	<thead>
@@ -36,15 +36,14 @@ auth-key : <input type="text" id="auth_key" style="width:800px" value="" />
 
 <script>
 	$("#btn_search").on("click", function () {
-		if($("#auth_key").val().trim().length == 0) {
-			alert("Pls, input auth-key.");
-			location.href = "key-gen.html";
+		if($("#api_key").val().trim().length == 0) {
+			alert("Pls, input api-key.");
 			return;
 		}
 		$("#trade-list").DataTable({
 			destroy: true,
 		    ajax: {
-				url: "/api/tv4u/list/" + $("#auth_key").val(),
+				url: "/api/tva/list/" + $("#api_key").val(),
 				dataSrc: ""
 			},
 	        columnDefs: [

@@ -27,7 +27,9 @@ public interface TradeRepository extends JpaRepository<TradeData, Long> {
 
 	List<TradeData> findTop2ByReqExchangeAndAuthKeyAndOrderSymbolAndReqTimeIsNullOrderByTradeNumAsc(String reqExchange, String authKey, String orderSymbol);
 
-	List<TradeData> findTop999ByAuthKeyOrderByTradeNumDesc(String authKey); // limit 999, 역순
+//	List<TradeData> findTop999ByAuthKeyOrderByTradeNumDesc(String authKey); // limit 999, 역순
+
+	List<TradeData> findTop999ByApiKeyOrderByTradeNumDesc(String apiKey); // limit 999, 역순
 
 	@Modifying
 	@Query(value = 
