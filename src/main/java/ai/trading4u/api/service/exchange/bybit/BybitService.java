@@ -198,7 +198,11 @@ public class BybitService {
 	        boolean isClose = false;
 	        if(data.getOrderName().toUpperCase().contains("TAKE")
 	        		|| data.getOrderName().toUpperCase().contains("EXIT")
-	        		|| data.getOrderName().toUpperCase().contains("CLOSE")) {
+	        		|| data.getOrderName().toUpperCase().contains("CLOSE")
+	        		|| data.getOrderName().toUpperCase().contains("STOP")
+	        		|| data.getOrderName().toUpperCase().contains("XSL")
+	        		|| data.getOrderName().toUpperCase().contains("XSS")
+	        		) {
 	        	isClose = true;
 	        }
 	        
