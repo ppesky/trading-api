@@ -25,10 +25,11 @@ import lombok.ToString;
 @Entity
 public class TradeData {
 	
-	public TradeData(String authKey, String eventName, String eventTime, 
+	public TradeData(String apiKey, String authKey, String eventName, String eventTime, 
 			String reqExchange, 
 			String orderSymbol, String orderMode, String orderName, String orderAction, String orderSize, String takePrice,
 			String reqData) {
+		this.apiKey = apiKey;
 		this.authKey = authKey;
 		this.eventName = eventName;
 		this.eventTime = eventTime;
@@ -46,6 +47,8 @@ public class TradeData {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long tradeNum;
+	
+	String apiKey;
 	
 	String authKey;
 	

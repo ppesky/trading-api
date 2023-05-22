@@ -1,6 +1,7 @@
 
 CREATE TABLE trade_data (
 	trade_num BIGINT UNSIGNED auto_increment NOT NULL,
+	api_key varchar(100) NOT NULL,
 	auth_key varchar(100) NOT NULL,
 	event_name varchar(30) NULL,
 	event_time varchar(50) NULL,

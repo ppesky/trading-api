@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ai.trading4u.api.service.domain.entity.TradeData;
+import ai.trading4u.api.web.entity.AuthKey;
 import ai.trading4u.api.web.entity.TradingviewOrderReq;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +25,8 @@ public class TradeService {
 	@Autowired ObjectMapper objectMapper;
 
 	@Autowired TradeRepository tradeRepository;
+
+	@Autowired AuthKeyService authKeyService;
 	
 	public List<TradeData> findTop999ByAuthKeyOrderByTradeNumDesc(String authKey) {
 		return tradeRepository.findTop999ByAuthKeyOrderByTradeNumDesc(authKey);
@@ -37,8 +40,39 @@ public class TradeService {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException("Json Parsing Error.");
 		}
+
+		AuthKey authKeyObj = authKeyService.resolveKey(tvOrder.getAuthKey());
 		
 		TradeData data = new TradeData(
+				authKeyObj.getApiKey(), 
+				tvOrder.getAuthKey(), 
+				tvOrder.getAlertName(), 
+				tvOrder.getAlertTime(), 
+				exchangeName.name(), 
+				tvOrder.getOrderSymbol(), 
+				tvOrder.getOrderMode(),
+				tvOrder.getOrderId(),
+				tvOrder.getOrderAction().name(),
+				tvOrder.getOrderSize(),
+				tvOrder.getTakePrice(),
+				paramJson);
+		
+		tradeRepository.save(data);
+		
+	}
+
+	/////// 여기는 크립토25 지원 코드. ///////
+	public void saveRequestForCrytor25(ExchangeName exchangeName, String apiKey, TradingviewOrderReq tvOrder) {
+		
+		String paramJson;
+		try {
+			paramJson = objectMapper.writeValueAsString(tvOrder);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Json Parsing Error.");
+		}
+		
+		TradeData data = new TradeData(
+				apiKey,
 				tvOrder.getAuthKey(), 
 				tvOrder.getAlertName(), 
 				tvOrder.getAlertTime(), 

@@ -49,7 +49,7 @@ class TradeServiceTest {
 				"order_symbol" : "IDUSDT.P",
 				"order_action" : "buy",
 				"order_size" : "1"
-				,"tp_price" : "0.6"
+				,"tp_price" : "0.9"
 			}
 			""";
 
@@ -80,7 +80,7 @@ class TradeServiceTest {
 				"order_symbol" : "IDUSDT.P",
 				"order_action" : "sell",
 				"order_size" : "1"
-				,"tp_price" : "0.4"
+				,"tp_price" : "0.04"
 			}
 			""";
 
@@ -163,7 +163,7 @@ class TradeServiceTest {
 				"order_symbol" : "1000PEPEUSDT.P",
 				"order_action" : "sell",
 				"order_size" : "101"
-				,"tp_price" : "0.001"
+				,"tp_price" : "0.0001"
 			}
 			""";
 

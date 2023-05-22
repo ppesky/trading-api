@@ -91,7 +91,7 @@ public class TradingviewController {
 		TradingviewOrderReq tvOrder = tva.toEntity();
 		tvOrder.setAuthKey(authKeyStr);
 		
-		tradeService.saveRequest(ExchangeName.BYBIT, tvOrder);
+		tradeService.saveRequestForCrytor25(ExchangeName.BYBIT, tva.getApiKey(), tvOrder);
 		return Map.of("result", "success");
 	}
 	
