@@ -1,4 +1,4 @@
-package ai.trading4u.api.service.exchange;
+package ai.trading4u.api.service.exchange.bybit;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
