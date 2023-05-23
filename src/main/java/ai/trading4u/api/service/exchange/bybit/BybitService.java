@@ -60,25 +60,29 @@ public class BybitService {
 		
 		String timestamp = Long.toString(ZonedDateTime.now().toInstant().toEpochMilli());
 		
-		BybitResponse res = 
+		String signature = genGetSign(authKeyObj.getApiKey(), authKeyObj.getApiSecret(), timestamp, Map.of());
+		
+		String res = 
 				sslWebClient
 				.get()
 				.uri(domain + "/v5/user/query-api")
 				.accept(MediaType.APPLICATION_JSON)
-				.header("apiKey", authKeyObj.getApiKey())
-				.header("secret", authKeyObj.getApiSecret())
+				.header("X-BAPI-API-KEY", authKeyObj.getApiKey())
+				.header("X-BAPI-SIGN", signature)
 				.header("X-BAPI-TIMESTAMP", timestamp)
 				.header("X-BAPI-RECV-WINDOW", RECV_WINDOW)
 				.retrieve()
-				.bodyToMono(BybitResponse.class)
+				.bodyToMono(String.class)
 				.block();
 
-		if(res.getRetCode() == 0) {
-			
-//			res.getResult() 에서 초대자코드 확인.
-			
-			return true;
-		}
+		log.debug(res);
+		
+//		if(res.getRetCode() == 0) {
+//			
+////			res.getResult() 에서 초대자코드 확인.
+//			
+//			return true;
+//		}
 		return false;
 		
 		/*
@@ -273,11 +277,11 @@ public class BybitService {
             String sb = timestamp + apiKey + RECV_WINDOW + paramJson;
             return bytesToHex(sha256_HMAC.doFinal(sb.getBytes()));
     	} catch(Exception e) {
+    		log.error(e.getMessage());
     		throw new RuntimeException("post signature generate error.");
     	}
     }
 
-    @SuppressWarnings("unused")
 	private String genGetSign(String apiKey, String apiSecret, String timestamp, Map<String, Object> params) {
     	try {
             StringBuilder sb = genQueryStr(params);
@@ -288,6 +292,7 @@ public class BybitService {
             sha256_HMAC.init(secret_key);
             return bytesToHex(sha256_HMAC.doFinal(queryStr.getBytes()));
     	} catch(Exception e) {
+    		log.error(e.getMessage());
     		throw new RuntimeException("get signature generate error.");
     	}
     }
@@ -308,6 +313,9 @@ public class BybitService {
     }
 
     private StringBuilder genQueryStr(Map<String, Object> map) {
+    	if(map == null || map.size() == 0) {
+    		return new StringBuilder();
+    	}
         Set<String> keySet = map.keySet();
         Iterator<String> iter = keySet.iterator();
         StringBuilder sb = new StringBuilder();
