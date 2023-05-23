@@ -46,10 +46,10 @@ class TradeServiceTest {
 				"order_exchange" : "BYBIT",
 				"order_category" : "future",
 				"order_mode" : "oneway",
-				"order_symbol" : "IDUSDT.P",
+				"order_symbol" : "10000LADYSUSDT.P",
 				"order_action" : "buy",
-				"order_size" : "1"
-				,"tp_price" : "0.9"
+				"order_size" : "100"
+				,"take_price" : "0.001"
 			}
 			""";
 
@@ -62,9 +62,9 @@ class TradeServiceTest {
 				"order_exchange" : "BYBIT",
 				"order_category" : "future",
 				"order_mode" : "oneway",
-				"order_symbol" : "IDUSDT.P",
+				"order_symbol" : "10000LADYSUSDT.P",
 				"order_action" : "sell",
-				"order_size" : "1"
+				"order_size" : "100"
 			}
 			""";
 
@@ -77,10 +77,10 @@ class TradeServiceTest {
 				"order_exchange" : "BYBIT",
 				"order_category" : "future",
 				"order_mode" : "oneway",
-				"order_symbol" : "IDUSDT.P",
+				"order_symbol" : "10000LADYSUSDT.P",
 				"order_action" : "sell",
-				"order_size" : "1"
-				,"tp_price" : "0.04"
+				"order_size" : "100"
+				,"take_price" : "0.0003"
 			}
 			""";
 
@@ -93,13 +93,12 @@ class TradeServiceTest {
 				"order_exchange" : "BYBIT",
 				"order_category" : "future",
 				"order_mode" : "oneway",
-				"order_symbol" : "IDUSDT.P",
+				"order_symbol" : "10000LADYSUSDT.P",
 				"order_action" : "buy",
-				"order_size" : "1"
+				"order_size" : "100"
 			}
 			""";
 
-//	,"tp_price" : ""
 
 //	@Rollback(false)
 	@Test
@@ -132,7 +131,7 @@ class TradeServiceTest {
 				"order_symbol" : "1000PEPEUSDT.P",
 				"order_action" : "buy",
 				"order_size" : "101"
-				,"tp_price" : "0.002"
+				,"take_price" : "0.002"
 			}
 			""";
 
@@ -163,7 +162,7 @@ class TradeServiceTest {
 				"order_symbol" : "1000PEPEUSDT.P",
 				"order_action" : "sell",
 				"order_size" : "101"
-				,"tp_price" : "0.0001"
+				,"take_price" : "0.0001"
 			}
 			""";
 
