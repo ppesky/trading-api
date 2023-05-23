@@ -12,6 +12,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -53,16 +54,19 @@ public class BybitService {
 	
 	@Autowired TradeRepository tradeRepository;
 	
-	public boolean validateReferral(AuthKey authKeyObj) {
+	public Integer getInviterID(AuthKey authKeyObj) {
 		// 키 인증  - User > Get API Key Information (/v5/user/query-api)
 		// https://bybit-exchange.github.io/docs/v5/user/apikey-info
-		// inviterID	integer	Inviter ID (the UID of the account which invited this account to the platform)
+		// isMaster : 마스터계정이면 true, 서브계정이면 false
+		// inviterID : 마스터계정과 서브계정의 값이 같다.
+		// affiliateID : 마스터계정일때 볼 수 있다. 서브계정은 0 으로 표시된다.
+		// sub account 까지 처리하려면 inviterID 로 체크해야 한다.
 		
 		String timestamp = Long.toString(ZonedDateTime.now().toInstant().toEpochMilli());
 		
 		String signature = genGetSign(authKeyObj.getApiKey(), authKeyObj.getApiSecret(), timestamp, Map.of());
 		
-		String res = 
+		Map<String, Object> res = 
 				sslWebClient
 				.get()
 				.uri(domain + "/v5/user/query-api")
@@ -72,10 +76,10 @@ public class BybitService {
 				.header("X-BAPI-TIMESTAMP", timestamp)
 				.header("X-BAPI-RECV-WINDOW", RECV_WINDOW)
 				.retrieve()
-				.bodyToMono(String.class)
+				.bodyToMono(new ParameterizedTypeReference<Map<String,Object>>(){})
 				.block();
 
-		log.debug(res);
+//		log.debug("Response\n {}", res);
 		
 //		if(res.getRetCode() == 0) {
 //			
@@ -83,68 +87,11 @@ public class BybitService {
 //			
 //			return true;
 //		}
-		return false;
 		
-		/*
-{
-    "retCode": 0,
-    "retMsg": "",
-    "result": {
-        "id": "13770661",
-        "note": "XXXXXX",
-        "apiKey": "XXXXXX",
-        "readOnly": 0,
-        "secret": "",
-        "permissions": {
-            "ContractTrade": [
-                "Order",
-                "Position"
-            ],
-            "Spot": [
-                "SpotTrade"
-            ],
-            "Wallet": [
-                "AccountTransfer",
-                "SubMemberTransfer"
-            ],
-            "Options": [
-                "OptionsTrade"
-            ],
-            "Derivatives": [
-                "DerivativesTrade"
-            ],
-            "CopyTrading": [
-                "CopyTrading"
-            ],
-            "BlockTrade": [],
-            "Exchange": [
-                "ExchangeHistory"
-            ],
-            "NFT": [
-                "NFTQueryProductList"
-            ]
-        },
-        "ips": [
-            "*"
-        ],
-        "type": 1,
-        "deadlineDay": 83,
-        "expiredAt": "2023-05-15T03:21:05Z",
-        "createdAt": "2022-10-16T02:24:40Z",
-        "unified": 0,
-        "uta": 0,
-        "userID": 24600000,
-        "inviterID": 0,
-        "vipLevel": "No VIP",
-        "mktMakerLevel": "0",
-        "affiliateID": 0,
-        "rsaPublicKey": "",
-        "isMaster": false
-    },
-    "retExtInfo": {},
-    "time": 1676891757649
-}
-		 */
+		if(((Integer) res.get("retCode")) == 0) {
+			return (Integer) ((Map<?, ?>)res.get("result")).get("inviterID");
+		}
+		return null;
 	}
 
 	@Async("bybitExecutor")
@@ -237,6 +184,7 @@ public class BybitService {
 	        } else {
 	            if(StringUtils.hasText(data.getTakePrice())) {
 	            	map.put("takeProfit", data.getTakePrice());
+//	            	map.put("tpslMode", "Full");
 	            }
 	        }
 	
@@ -250,7 +198,6 @@ public class BybitService {
     				.accept(MediaType.APPLICATION_JSON)
     				.header("X-BAPI-API-KEY", authKeyObj.getApiKey())
     				.header("X-BAPI-SIGN", signature)
-//    				.header("X-BAPI-SIGN-TYPE", "2")
     				.header("X-BAPI-TIMESTAMP", timestamp)
     				.header("X-BAPI-RECV-WINDOW", RECV_WINDOW)
     				.bodyValue(map)

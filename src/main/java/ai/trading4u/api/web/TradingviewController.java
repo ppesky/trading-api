@@ -15,6 +15,7 @@ import ai.trading4u.api.service.domain.AllowedAccountService;
 import ai.trading4u.api.service.domain.AuthKeyService;
 import ai.trading4u.api.service.domain.ExchangeName;
 import ai.trading4u.api.service.domain.TradeService;
+import ai.trading4u.api.service.domain.entity.AllowedType;
 import ai.trading4u.api.service.domain.entity.TradeData;
 import ai.trading4u.api.service.domain.entity.TradeDataDto;
 import ai.trading4u.api.web.entity.AuthKey;
@@ -26,15 +27,16 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class TradingviewController {
 	
-	enum AllowedType {AUTH_KEY, EXCHANGE_KEY}
-	
 	@Autowired AllowedAccountService allowedAccountService;
 	@Autowired AuthKeyService authKeyService;
 	@Autowired TradeService tradeService;
 
 	@PostMapping("/tv4u/webhook/bybit")
 	public Map<String, Object> orderWebhookForBybit(@RequestBody TradingviewOrderReq tvOrder) {
-		boolean b = allowedAccountService.isAllowedAccount(AllowedType.AUTH_KEY.name(), tvOrder.getAuthKey());
+//		boolean b = allowedAccountService.isAllowedAccount(AllowedType.AUTH_KEY, tvOrder.getAuthKey());
+		
+		boolean b = allowedAccountService.isAllowedByBybitReferral(tvOrder.getAuthKey());
+		
 		if(!b) {
 			log.warn("[TV4U] Your key cannot be used. (" + tvOrder.getAuthKey() + ")");
 			return Map.of("result", "Your key cannot be used.");
@@ -65,6 +67,7 @@ public class TradingviewController {
 //				.collect(Collectors.toList());
 //	}
 
+	/*
 	@GetMapping("/check/{type}/{key}")
 	public Map<String, Object> checkKey(
 			@PathVariable("type") String allowedType,
@@ -76,12 +79,13 @@ public class TradingviewController {
 		}
 		return Map.of("result", "Your key can be used.");
 	}
+	*/
 	
 	/////// 여기 아래는 크립토25 지원 코드. ///////
 
 	@PostMapping("/tva/webhook/bybit")
 	public Map<String, Object> orderWebhookByTva(@RequestBody Crypto25TvaOrderReq tva) {
-		boolean b = allowedAccountService.isAllowedAccount(AllowedType.EXCHANGE_KEY.name(), tva.getApiKey());
+		boolean b = allowedAccountService.isAllowedAccount(AllowedType.EXCHANGE_KEY, tva.getApiKey());
 		if(!b) {
 			log.warn("[tva] Your key cannot be used. (" + tva.getApiKey() + ")");
 			return Map.of("result", "Your key cannot be used.");

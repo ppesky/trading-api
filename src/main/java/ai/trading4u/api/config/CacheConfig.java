@@ -21,16 +21,16 @@ public class CacheConfig {
 
 		CaffeineCache allowedCache = new CaffeineCache(
 				DomainCacheType.allowed_account.name(), 
-				Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build()
+				Caffeine.newBuilder().expireAfterWrite(12, TimeUnit.HOURS).build()
 		);
 
 		CaffeineCache authkeyCache = new CaffeineCache(
-				DomainCacheType.auth_key.name(), 
+				DomainCacheType.resolve_key.name(), 
 				Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).build()
 		);
 
 		CaffeineCache exchangekeyCache = new CaffeineCache(
-				DomainCacheType.exchange_key.name(), 
+				DomainCacheType.generate_key.name(), 
 				Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).build()
 		);
 

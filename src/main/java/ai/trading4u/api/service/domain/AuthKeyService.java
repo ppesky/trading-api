@@ -17,8 +17,20 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AuthKeyService {
 	
-	private String internalKey = "Tbe_rhJ#nw$9Aahj";
-	
+	@Cacheable(cacheNames = "generate_key", key="{#exchangeName, #apiKey, #apiSecret}", unless="#result == null")
+	public String getAuthKeyStr(String exchangeName, String apiKey, String apiSecret) {
+		log.info("getAuthKeyStr = " + exchangeName +","+ apiKey);
+		AuthKey authKey = new AuthKey(exchangeName, apiKey, apiSecret);
+		return generateKey(authKey);
+	}
+
+	@Cacheable(cacheNames = "resolve_key", unless="#result == null")
+	public AuthKey resolveKey(String authKeyStr) {
+		log.info("resolveKey = " + authKeyStr);
+		String computeString = decrypt(authKeyStr);
+		return AuthKey.getAuthKey(authKeyStr, computeString);
+	}
+
 	public String generateKey(AuthKey authKey) {
 		log.info(authKey.getExchangeName() + " - " + authKey.getApiKey() + " generate.");
 		if(StringUtils.hasText(authKey.getComputeString())) {
@@ -27,20 +39,8 @@ public class AuthKeyService {
 		return null;
 	}
 
-	@Cacheable(cacheNames = "exchange_key", key="{#exchangeName, #apiKey}", unless="#result == null")
-	public String getAuthKeyStr(String exchangeName, String apiKey, String apiSecret) {
-		log.info("getAuthKeyStr = " + exchangeName +","+ apiKey);
-		AuthKey authKey = new AuthKey(exchangeName, apiKey, apiSecret);
-		return generateKey(authKey);
-	}
-
-	@Cacheable(cacheNames = "auth_key", unless="#result == null")
-	public AuthKey resolveKey(String authKeyStr) {
-		log.info("resolveKey = " + authKeyStr);
-		String computeString = decrypt(authKeyStr);
-		return AuthKey.getAuthKey(authKeyStr, computeString);
-	}
-
+	private String internalKey = "Tbe_rhJ#nw$9Aahj";
+	
 	public String encrypt(String plainText) {
 		return encrypt(internalKey, plainText);
 	}

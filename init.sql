@@ -25,7 +25,7 @@ COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE allowed_account (
 	allowed_num BIGINT UNSIGNED auto_increment NOT NULL,
-	allowed_type varchar(12) NOT NULL,
+	allowed_type varchar(20) NOT NULL,
 	allowed_name varchar(100) NOT NULL,
 	CONSTRAINT allowed_account_PK PRIMARY KEY (allowed_num)
 )
